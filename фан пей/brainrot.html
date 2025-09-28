@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BrainRot FunPay - Полная торговая площадка</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #ff6b00;
+            --primary-dark: #e55a00;
+            --secondary: #2c3e50;
+            --light-bg: #f8f9fa;
+            --dark-bg: #34495e;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --info: #3498db;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5%;
+            border-bottom: 1px solid #eee;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .admin-panel {
+            background: var(--success);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .search-bar {
+            flex: 0 1 500px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .search-bar input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-outline {
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            background: transparent;
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #219653;
+        }
+
+        .nav-menu {
+            display: flex;
+            justify-content: center;
+            padding: 10px 5%;
+            gap: 30px;
+        }
+
+        .nav-item {
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 20px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+
+        .sidebar-section {
+            margin-bottom: 25px;
+        }
+
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .filter-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .filter-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .filter-option input {
+            margin: 0;
+        }
+
+        /* Products Grid */
+        .products-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .sort-options select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 160px;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: var(--text-light);
+            border-bottom: 1px solid #eee;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 15px;
+        }
+
+        .product-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+        }
+
+        .product-description {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .product-type {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            background: #3498db;
+            color: white;
+        }
+
+        .product-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .commission-badge {
+            font-size: 12px;
+            color: var(--text-light);
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 5px;
+        }
+
+        .product-seller {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .seller-rating {
+            color: var(--warning);
+            font-weight: 500;
+        }
+
+        /* Admin Panel */
+        .admin-dashboard {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--light-bg);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(255,107,0,0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .auth-link {
+            color: var(--primary);
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        /* Seller Panel */
+        .seller-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .my-products {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-top {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .search-bar {
+                flex: 1;
+                width: 100%;
+            }
+            
+            .nav-menu {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-top">
+            <div class="logo">
+                🎮 BrainRot FunPay
+                <div class="admin-panel" id="adminBadge" style="display: none;">ADMIN</div>
+            </div>
+            <div class="search-bar">
+                <input type="text" placeholder="Поиск товаров и услуг...">
+            </div>
+            <div class="user-actions">
+                <button class="btn btn-outline" onclick="showAuthModal()">Войти</button>
+                <button class="btn btn-primary" onclick="showAddProductModal()">Продавать</button>
+            </div>
+        </div>
+        <nav class="nav-menu">
+            <a href="#" class="nav-item active">Главная</a>
+            <a href="#" class="nav-item">Игры</a>
+            <a href="#" class="nav-item">Услуги</a>
+            <a href="#" class="nav-item">Аккаунты</a>
+            <a href="#" class="nav-item">Валюта</a>
+            <a href="#" class="nav-item">Помощь</a>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Категории</h3>
+                <div class="filter-options">
+                    <label class="filter-option">
+                        <input type="checkbox" checked> Все товары
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox"> Игровые предметы
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox"> Услуги
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox"> Аккаунты
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox"> Валюта
+                    </label>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Тип товара</h3>
+                <div class="filter-options">
+                    <label class="filter-option">
+                        <input type="checkbox" checked> Все типы
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox"> Обычный
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox"> Редкий
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox"> Секретный
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox"> Бог
+                    </label>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Цена</h3>
+                <div class="filter-options">
+                    <label class="filter-option">
+                        <input type="radio" name="price" checked> Любая
+                    </label>
+                    <label class="filter-option">
+                        <input type="radio" name="price"> До 100 руб.
+                    </label>
+                    <label class="filter-option">
+                        <input type="radio" name="price"> 100-500 руб.
+                    </label>
+                    <label class="filter-option">
+                        <input type="radio" name="price"> 500-1000 руб.
+                    </label>
+                    <label class="filter-option">
+                        <input type="radio" name="price"> От 1000 руб.
+                    </label>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Products -->
+        <main>
+            <!-- Admin Dashboard -->
+            <div class="admin-dashboard" id="adminPanel" style="display: none;">
+                <div class="panel-header">
+                    <h2>💰 Панель администратора</h2>
+                    <button class="btn btn-success" onclick="withdrawCommission()">Вывести комиссию</button>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalCommission">0 руб.</div>
+                        <div class="stat-label">Общая комиссия</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="availableCommission">0 руб.</div>
+                        <div class="stat-label">Доступно к выводу</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalSales">0</div>
+                        <div class="stat-label">Всего продаж</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="commissionRate">10%</div>
+                        <div class="stat-label">Ставка комиссии</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">💳 Номер карты для выплат</label>
+                    <input type="text" class="form-control" id="adminCard" placeholder="0000 0000 0000 0000">
+                    <small style="color: var(--text-light);">На эту карту будут поступать 10% от каждой продажи</small>
+                </div>
+            </div>
+
+            <div class="products-header">
+                <h2>Популярные товары</h2>
+                <div class="sort-options">
+                    <select>
+                        <option>По популярности</option>
+                        <option>По цене (возрастание)</option>
+                        <option>По цене (убывание)</option>
+                        <option>По новизне</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="products-grid" id="productsGrid">
+                <!-- Products will be loaded here -->
+            </div>
+
+            <!-- Seller Panel (visible when logged in as seller) -->
+            <div class="seller-panel" id="sellerPanel" style="display: none;">
+                <div class="panel-header">
+                    <h3>Мои товары</h3>
+                    <button class="btn btn-primary" onclick="showAddProductModal()">Добавить товар</button>
+                </div>
+                <div class="my-products" id="myProducts">
+                    <!-- Seller's products will be here -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Auth Modal -->
+    <div class="modal" id="authModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="authTitle">Вход в систему</h3>
+                <button class="close-modal" onclick="closeModal('authModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="authForm">
+                    <div class="form-group">
+                        <label class="form-label">Логин</label>
+                        <input type="text" class="form-control" id="authUsername" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Пароль</label>
+                        <input type="password" class="form-control" id="authPassword" required>
+                    </div>
+
+                    <div class="form-group" id="emailField" style="display: none;">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="authEmail">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" onclick="closeModal('authModal')">Отмена</button>
+                        <button type="submit" class="btn btn-primary" id="authSubmit">Войти</button>
+                    </div>
+                </form>
+
+                <div class="auth-switch">
+                    <span id="authSwitchText">Нет аккаунта? </span>
+                    <span class="auth-link" id="authSwitchLink" onclick="switchAuthMode()">Зарегистрироваться</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Product Modal -->
+    <div class="modal" id="addProductModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Добавить товар</h3>
+                <button class="close-modal" onclick="closeModal('addProductModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addProductForm">
+                    <div class="form-group">
+                        <label class="form-label">Название товара</label>
+                        <input type="text" class="form-control" id="productName" required placeholder="Введите название товара">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Описание</label>
+                        <textarea class="form-control" id="productDescription" rows="3" required placeholder="Опишите ваш товар"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Цена (руб.)</label>
+                        <input type="number" class="form-control" id="productPrice" required min="1" placeholder="100">
+                        <small style="color: var(--text-light);">Комиссия системы: 10% (<span id="commissionPreview">0</span> руб.)</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Тип товара</label>
+                        <input type="text" class="form-control" id="productType" required placeholder="Например: Секретный, Бог, Обычный, Редкий">
+                        <small style="color: var(--text-light);">Введите любой тип товара который хотите</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Изображение (эмодзи или URL)</label>
+                        <input type="text" class="form-control" id="productImage" placeholder="🎮 или https://example.com/image.jpg">
+                        <small style="color: var(--text-light);">Можно использовать эмодзи или ссылку на изображение</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Категория</label>
+                        <select class="form-control" id="productCategory" required>
+                            <option value="items">Игровые предметы</option>
+                            <option value="services">Услуги</option>
+                            <option value="accounts">Аккаунты</option>
+                            <option value="currency">Валюта</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" onclick="closeModal('addProductModal')">Отмена</button>
+                        <button type="submit" class="btn btn-primary">Добавить товар</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data storage
+        let products = JSON.parse(localStorage.getItem('brainrot_products')) || [];
+        let users = JSON.parse(localStorage.getItem('brainrot_users')) || [];
+        let currentUser = JSON.parse(localStorage.getItem('brainrot_currentUser')) || null;
+        let commissionData = JSON.parse(localStorage.getItem('brainrot_commission')) || {
+            totalCommission: 0,
+            availableCommission: 0,
+            totalSales: 0,
+            adminCard: ''
+        };
+
+        // Commission rate (10%)
+        const COMMISSION_RATE = 0.1;
+        let isLoginMode = true;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProducts();
+            checkAuth();
+            updateCommissionDisplay();
+            setupEventListeners();
+            
+            // Create admin user if not exists
+            if (!users.find(u => u.username === 'admin')) {
+                users.push({
+                    id: 1,
+                    username: 'admin',
+                    password: 'admin',
+                    email: 'admin@brainrot.com',
+                    isAdmin: true,
+                    balance: 0,
+                    registrationDate: new Date().toISOString()
+                });
+                saveUsers();
+            }
+        });
+
+        function setupEventListeners() {
+            // Update commission preview when price changes
+            document.getElementById('productPrice').addEventListener('input', function() {
+                const price = parseInt(this.value) || 0;
+                const commission = Math.floor(price * COMMISSION_RATE);
+                document.getElementById('commissionPreview').textContent = commission;
+            });
+        }
+
+        // Load products to grid
+        function loadProducts() {
+            const grid = document.getElementById('productsGrid');
+            
+            // Only show empty state if no products
+            if (products.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                        <h3>🎮 Товаров пока нет</h3>
+                        <p>Будьте первым, кто добавит товар на площадку!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = products.map(product => {
+                const commission = Math.floor(product.price * COMMISSION_RATE);
+                
+                return `
+                <div class="product-card" onclick="viewProduct(${product.id})">
+                    <div class="product-image">
+                        ${product.image}
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">${product.name}</h3>
+                        <p class="product-description">${product.description}</p>
+                        <div class="product-meta">
+                            <span class="product-type">${product.type}</span>
+                            <span class="product-price">
+                                ${product.price} руб.
+                                <span class="commission-badge">-10% комиссия</span>
+                            </span>
+                        </div>
+                        <div class="product-seller">
+                            <span>${product.seller}</span>
+                            <span class="seller-rating">⭐ ${product.rating}</span>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        // Commission functions
+        function addCommission(amount) {
+            commissionData.totalCommission += amount;
+            commissionData.availableCommission += amount;
+            commissionData.totalSales++;
+            saveCommissionData();
+            updateCommissionDisplay();
+        }
+
+        function updateCommissionDisplay() {
+            document.getElementById('totalCommission').textContent = commissionData.totalCommission + ' руб.';
+            document.getElementById('availableCommission').textContent = commissionData.availableCommission + ' руб.';
+            document.getElementById('totalSales').textContent = commissionData.totalSales;
+            document.getElementById('adminCard').value = commissionData.adminCard || '';
+        }
+
+        function saveCommissionData() {
+            localStorage.setItem('brainrot_commission', JSON.stringify(commissionData));
+        }
+
+        function withdrawCommission() {
+            const card = document.getElementById('adminCard').value;
+            if (!card || card.length < 16) {
+                alert('Введите корректный номер карты');
+                return;
+            }
+
+            if (commissionData.availableCommission <= 0) {
+                alert('Нет доступных средств для вывода');
+                return;
+            }
+
+            commissionData.adminCard = card;
+            
+            alert(`✅ Вывод ${commissionData.availableCommission} руб. на карту ${card} выполнен!`);
+            commissionData.availableCommission = 0;
+            saveCommissionData();
+            updateCommissionDisplay();
+        }
+
+        // Auth functions
+        function showAuthModal() {
+            resetAuthForm();
+            document.getElementById('authModal').style.display = 'block';
+        }
+
+        function switchAuthMode() {
+            isLoginMode = !isLoginMode;
+            resetAuthForm();
+        }
+
+        function resetAuthForm() {
+            const title = document.getElementById('authTitle');
+            const submit = document.getElementById('authSubmit');
+            const switchText = document.getElementById('authSwitchText');
+            const switchLink = document.getElementById('authSwitchLink');
+            const emailField = document.getElementById('emailField');
+
+            if (isLoginMode) {
+                title.textContent = 'Вход в систему';
+                submit.textContent = 'Войти';
+                switchText.textContent = 'Нет аккаунта? ';
+                switchLink.textContent = 'Зарегистрироваться';
+                emailField.style.display = 'none';
+            } else {
+                title.textContent = 'Регистрация';
+                submit.textContent = 'Зарегистрироваться';
+                switchText.textContent = 'Уже есть аккаунт? ';
+                switchLink.textContent = 'Войти';
+                emailField.style.display = 'block';
+            }
+
+            document.getElementById('authForm').reset();
+        }
+
+        // Auth form
+        document.getElementById('authForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('authUsername').value;
+            const password = document.getElementById('authPassword').value;
+            const email = document.getElementById('authEmail').value;
+
+            if (isLoginMode) {
+                // Login
+                let user = users.find(u => u.username === username && u.password === password);
+                
+                if (!user) {
+                    alert('Неверный логин или пароль');
+                    return;
+                }
+                
+                currentUser = user;
+                localStorage.setItem('brainrot_currentUser', JSON.stringify(user));
+                checkAuth();
+                closeModal('authModal');
+                alert(`Добро пожаловать, ${username}!`);
+            } else {
+                // Register
+                if (users.find(u => u.username === username)) {
+                    alert('Пользователь с таким логином уже существует');
+                    return;
+                }
+                
+                const newUser = {
+                    id: Date.now(),
+                    username: username,
+                    password: password,
+                    email: email,
+                    isAdmin: false,
+                    balance: 0,
+                    registrationDate: new Date().toISOString()
+                };
+                
+                users.push(newUser);
+                saveUsers();
+                
+                currentUser = newUser;
+                localStorage.setItem('brainrot_currentUser', JSON.stringify(newUser));
+                checkAuth();
+                closeModal('authModal');
+                alert('Регистрация успешна! Добро пожаловать!');
+            }
+        });
+
+        // Modal functions
+        function showAddProductModal() {
+            if (!currentUser) {
+                showAuthModal();
+                return;
+            }
+            document.getElementById('addProductModal').style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Add product form
+        document.getElementById('addProductForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const price = parseInt(document.getElementById('productPrice').value);
+            const commission = Math.floor(price * COMMISSION_RATE);
+            
+            const newProduct = {
+                id: Date.now(),
+                name: document.getElementById('productName').value,
+                description: document.getElementById('productDescription').value,
+                price: price,
+                type: document.getElementById('productType').value,
+                image: document.getElementById('productImage').value || '🎁',
+                category: document.getElementById('productCategory').value,
+                seller: currentUser.username,
+                rating: 5.0,
+                date: new Date().toISOString()
+            };
+
+            products.push(newProduct);
+            saveProducts();
+            loadProducts();
+            closeModal('addProductModal');
+            this.reset();
+            
+            alert('Товар успешно добавлен! При продаже с него будет списана комиссия 10%');
+        });
+
+        function checkAuth() {
+            if (currentUser) {
+                document.getElementById('sellerPanel').style.display = 'block';
+                document.querySelector('.user-actions').innerHTML = `
+                    <span>Привет, ${currentUser.username}</span>
+                    <button class="btn btn-outline" onclick="logout()">Выйти</button>
+                    <button class="btn btn-primary" onclick="showAddProductModal()">Продавать</button>
+                `;
+
+                if (currentUser.isAdmin) {
+                    document.getElementById('adminPanel').style.display = 'block';
+                    document.getElementById('adminBadge').style.display = 'inline-block';
+                }
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('brainrot_currentUser');
+            document.getElementById('sellerPanel').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('adminBadge').style.display = 'none';
+            document.querySelector('.user-actions').innerHTML = `
+                <button class="btn btn-outline" onclick="showAuthModal()">Войти</button>
+                <button class="btn btn-primary" onclick="showAddProductModal()">Продавать</button>
+            `;
+        }
+
+        function viewProduct(productId) {
+            const product = products.find(p => p.id === productId);
+            if (product) {
+                const commission = Math.floor(product.price * COMMISSION_RATE);
+                const sellerEarnings = product.price - commission;
+                
+                alert(`Товар: ${product.name}\nТип: ${product.type}\nЦена: ${product.price} руб.\nКомиссия 10%: ${commission} руб.\nПродавец получает: ${sellerEarnings} руб.\nПродавец: ${product.seller}`);
+                
+                // Simulate purchase (add commission)
+                if (confirm(`Купить "${product.name}" за ${product.price} руб.?`)) {
+                    addCommission(commission);
+                    alert('Покупка совершена! Комиссия добавлена в ваш баланс.');
+                }
+            }
+        }
+
+        // Save functions
+        function saveProducts() {
+            localStorage.setItem('brainrot_products', JSON.stringify(products));
+        }
+
+        function saveUsers() {
+            localStorage.setItem('brainrot_users', JSON.stringify(users));
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
