@@ -45,6 +45,131 @@ function updateUI() {
         statusText.textContent = 'Расширение выключено';
         toggleSwitch.checked = false;
     }
+    
+    // Update auto-test stats
+    updateAutoTestStats();
+}
+
+// Auto-test functions
+function startAutoTest() {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {action: 'startAutoTest'}, function(response) {
+            if (response && response.success) {
+                updateAutoTestStats();
+                showNotification('✅ Авто-тест запущен!');
+            } else {
+                showNotification('⚠️ Не удалось запустить авто-тест');
+            }
+        });
+    });
+}
+
+function stopAutoTest() {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {action: 'stopAutoTest'}, function(response) {
+            if (response && response.success) {
+                updateAutoTestStats();
+                showNotification('❌ Авто-тест остановлен');
+            }
+        });
+    });
+    
+    // Also stop multi-tab solver
+    MultiTabSolver.stop();
+}
+
+function updateAutoTestStats() {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {action: 'getAutoTestStats'}, function(response) {
+            if (response) {
+                const statsEl = document.getElementById('auto-test-stats');
+                statsEl.textContent = `Авто-тест: ${response.solved} ✅ | ${response.failed} ❌`;
+            }
+        });
+    });
+    
+    // Update multi-tab stats
+    updateMultiTabStats();
+}
+
+function updateMultiTabStats() {
+    const statsEl = document.getElementById('auto-test-stats');
+    const multiTabStats = MultiTabSolver.getStats();
+    if (multiTabStats.isRunning) {
+        statsEl.textContent += ` | Все вкладки: ${multiTabStats.solvedTabs}/${multiTabStats.totalTabs} ✅`;
+    }
+}
+
+function startMultiTab() {
+    showNotification('🌐 Запускаю решение во всех вкладках...');
+    MultiTabSolver.solveAllTabs(function(result) {
+        if (result.action === 'finished') {
+            showNotification(`✅ Готово! ${result.solved} ✅ | ${result.failed} ❌`);
+            updateAutoTestStats();
+        } else if (result.action === 'no_tabs') {
+            showNotification('⚠️ Нет вкладок с тестами');
+        }
+    });
+    updateAutoTestStats();
+}
+
+function solveCurrentAndNext() {
+    showNotification('➡️ Решаю текущую и следующую вкладку...');
+    
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        if (tabs.length === 0) return;
+        
+        const currentTab = tabs[0];
+        
+        // Solve current tab
+        chrome.tabs.sendMessage(currentTab.id, {action: 'startAutoTest'}, function(response) {
+            if (response && response.success) {
+                showNotification('✅ Текущая вкладка решена!');
+            } else {
+                showNotification('⚠️ Не удалось решить текущую вкладку');
+            }
+            
+            // Move to next tab
+            setTimeout(() => {
+                chrome.tabs.query({}, function(allTabs) {
+                    const currentIndex = allTabs.findIndex(t => t.id === currentTab.id);
+                    if (currentIndex < allTabs.length - 1) {
+                        const nextTab = allTabs[currentIndex + 1];
+                        chrome.tabs.update(nextTab.id, {active: true}, function() {
+                            setTimeout(() => {
+                                chrome.tabs.sendMessage(nextTab.id, {action: 'startAutoTest'}, function(response) {
+                                    if (response && response.success) {
+                                        showNotification('✅ Следующая вкладка решена!');
+                                    } else {
+                                        showNotification('⚠️ Не удалось решить следующую вкладку');
+                                    }
+                                });
+                            }, 1000);
+                        });
+                    } else {
+                        showNotification('ℹ️ Это последняя вкладка');
+                    }
+                });
+            }, 2000);
+        });
+    });
+}
+
+function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.style.position = 'fixed';
+    notification.style.top = '20px';
+    notification.style.right = '20px';
+    notification.style.padding = '10px 20px';
+    notification.style.background = 'rgba(0,0,0,0.8)';
+    notification.style.color = 'white';
+    notification.style.borderRadius = '8px';
+    notification.style.zIndex = '9999';
+    notification.style.animation = 'fadeIn 0.3s, fadeOut 0.3s 2s forwards';
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => notification.remove(), 3000);
 }
 
 // Проверка текущей вкладки

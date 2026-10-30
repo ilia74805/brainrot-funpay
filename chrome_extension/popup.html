@@ -256,8 +256,28 @@
         </button>
     </div>
     
+    <div class="buttons">
+        <button class="btn" style="background: linear-gradient(135deg, #FF5722 0%, #E64A19 100%);" onclick="startAutoTest()">
+            🚀 АВТО-ТЕСТ
+        </button>
+        <button class="btn" style="background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);" onclick="stopAutoTest()">
+            ⏹️ ОСТАНОВИТЬ
+        </button>
+    </div>
+    
+    <div class="buttons">
+        <button class="btn" style="background: linear-gradient(135deg, #2196F3 0%, #03A9F4 100%);" onclick="startMultiTab()">
+            🌐 ВСЕ ВКЛАДКИ
+        </button>
+        <button class="btn" style="background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);" onclick="solveCurrentAndNext()">
+            ➡️ ТЕКУЩАЯ + СЛЕДУЮЩАЯ
+        </button>
+    </div>
+    
     <div class="stats" id="stats">
         Найдено: <span id="found-count">0</span> выражений
+        <br>
+        <span id="auto-test-stats" style="font-size: 12px; margin-top: 5px; display: block;"></span>
     </div>
     
     <div class="tabs">

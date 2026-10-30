@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Page for Super Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .test-section h2 {
+            color: #667eea;
+            margin-top: 0;
+        }
+        .math-problem {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin: 10px 0;
+        }
+        .answer {
+            color: #666;
+            font-style: italic;
+        }
+        .input-test {
+            margin: 15px 0;
+        }
+        .input-test input {
+            padding: 8px;
+            width: 200px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Super Calculator Test Page</h1>
+    <p>This page tests the Chrome extension's ability to detect and solve various types of problems.</p>
+
+    <div class="test-section">
+        <h2>Basic Arithmetic</h2>
+        <p class="math-problem">2 + 3 = ?</p>
+        <p class="math-problem">15 * 7 = ?</p>
+        <p class="math-problem">100 / 4 = ?</p>
+    </div>
+
+    <div class="test-section">
+        <h2>Fractions</h2>
+        <p class="math-problem">1/2 + 3/4 = ?</p>
+        <p class="math-problem">5/6 * 2/3 = ?</p>
+        <p class="math-problem">7/8 - 1/4 = ?</p>
+    </div>
+
+    <div class="test-section">
+        <h2>Geometry</h2>
+        <p class="math-problem">Площадь круга радиус 5 = ?</p>
+        <p class="math-problem">area circle radius 3 = ?</p>
+        <p class="math-problem">Площадь квадрата сторона 4 = ?</p>
+    </div>
+
+    <div class="test-section">
+        <h2>Algebra</h2>
+        <p class="math-problem">x + 5 = 10</p>
+        <p class="math-problem">2x^2 + 3x - 5 = 0</p>
+        <p class="math-problem">3x - 7 = 14</p>
+    </div>
+
+    <div class="test-section">
+        <h2>Trigonometry</h2>
+        <p class="math-problem">sin(30°) = ?</p>
+        <p class="math-problem">cos(45°) = ?</p>
+        <p class="math-problem">sin(90) + cos(0) = ?</p>
+    </div>
+
+    <div class="test-section">
+        <h2>Combinatorics</h2>
+        <p class="math-problem">Факториал 5 = ?</p>
+        <p class="math-problem">factorial 6 = ?</p>
+        <p class="math-problem">Сочетания из 10 по 3 = ?</p>
+    </div>
+
+    <div class="test-section">
+        <h2>Petya's Average Problem (Russian)</h2>
+        <p class="math-problem">Петя написал программу, которая считает среднее арифметическое введённых чисел. Он вводит в компьютер некоторые натуральные числа и замечает, что среднее арифметическое всех введённых чисел возрастает на 3 после каждого следующего введённого числа (не считая самого первого). На сколько тысячное введённое Петей число будет больше первого?</p>
+    </div>
+
+    <div class="test-section">
+        <h2>Input Fields Test</h2>
+        <div class="input-test">
+            <label>Calculate: 5 + 3 = </label>
+            <input type="text" value="5 + 3" />
+        </div>
+        <div class="input-test">
+            <label>Calculate: 10 * 7 = </label>
+            <input type="text" value="10 * 7" />
+        </div>
+        <div class="input-test">
+            <label>Calculate: </label>
+            <input type="number" value="2^8" />
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Statistics</h2>
+        <p class="math-problem">Среднее арифметическое 5, 10, 15 = ?</p>
+        <p class="math-problem">Вероятность выпадения орла = ?</p>
+    </div>
+
+    <script>
+        // This script helps test if the extension is working
+        console.log('Test page loaded');
+        
+        // Add some dynamic content
+        setTimeout(() => {
+            const dynamicSection = document.createElement('div');
+            dynamicSection.className = 'test-section';
+            dynamicSection.innerHTML = `
+                <h2>Dynamic Content Test</h2>
+                <p class="math-problem">100 + 200 = ?</p>
+                <p class="math-problem">50 / 2 = ?</p>
+            `;
+            document.body.appendChild(dynamicSection);
+        }, 2000);
+    </script>
+</body>
+</html>

@@ -40,6 +40,47 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         });
         return true; // Асинхронный ответ
     }
+    
+    // Auto-test functions
+    if (request.action === 'startAutoTest') {
+        chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+            if (tabs.length > 0) {
+                chrome.tabs.sendMessage(tabs[0].id, {action: 'startAutoTest'}, sendResponse);
+            }
+        });
+        return true;
+    }
+    
+    if (request.action === 'stopAutoTest') {
+        chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+            if (tabs.length > 0) {
+                chrome.tabs.sendMessage(tabs[0].id, {action: 'stopAutoTest'}, sendResponse);
+            }
+        });
+        return true;
+    }
+    
+    if (request.action === 'getAutoTestStats') {
+        chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+            if (tabs.length > 0) {
+                chrome.tabs.sendMessage(tabs[0].id, {action: 'getAutoTestStats'}, sendResponse);
+            }
+        });
+        return true;
+    }
+    
+    // Multi-tab functions
+    if (request.action === 'startMultiTab') {
+        // This is handled by popup.js directly
+        sendResponse({success: true});
+        return true;
+    }
+    
+    if (request.action === 'solveCurrentAndNext') {
+        // This is handled by popup.js directly
+        sendResponse({success: true});
+        return true;
+    }
 });
 
 // Контекстное меню

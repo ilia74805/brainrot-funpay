@@ -154,7 +154,22 @@ function findAllTasks() {
     for (const textNode of textNodes) {
         const text = textNode.nodeValue;
         
-        // Try text parser first
+        // Try AI solver first (most powerful)
+        const aiSolution = AISolver.solve(text);
+        if (aiSolution) {
+            tasks.push({
+                text: aiSolution.originalText || text,
+                type: 'ai',
+                node: textNode,
+                start: text.indexOf(aiSolution.originalText || text),
+                end: text.indexOf(aiSolution.originalText || text) + (aiSolution.originalText || text).length,
+                solution: aiSolution,
+                isTextTask: true
+            });
+            continue;
+        }
+        
+        // Try text parser as fallback
         const textTask = TextTaskParser.parse(text);
         if (textTask) {
             tasks.push({
@@ -214,6 +229,11 @@ function highlightTasks(tasks) {
 function solveExpression(expr) {
     const text = expr.dataset.originalText;
     if (expr.dataset.textTask === 'true') {
+        // Try AI solver first
+        const aiSolution = AISolver.solve(text);
+        if (aiSolution) return {result: aiSolution.result, description: aiSolution.description, expression: aiSolution.expression || aiSolution.type};
+        
+        // Fallback to text parser
         const task = TextTaskParser.parse(text);
         if (task) return {result: task.result, description: task.description, expression: task.expression};
     }
@@ -348,12 +368,33 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         sendResponse({enabled: isEnabled});
     }
     if (request.action === 'solveSelection') {
-        const solution = TextTaskParser.parse(request.text);
-        if (solution) sendResponse({result: solution.result, description: solution.description});
-        else {
-            const result = Calculator.evaluate(request.text);
-            sendResponse(result !== null ? {result: result} : {error: 'Не удалось решить'});
+        const aiSolution = AISolver.solve(request.text);
+        if (aiSolution) {
+            sendResponse({result: aiSolution.result, description: aiSolution.description, strategy: aiSolution.strategy});
+        } else {
+            const solution = TextTaskParser.parse(request.text);
+            if (solution) sendResponse({result: solution.result, description: solution.description});
+            else {
+                const result = Calculator.evaluate(request.text);
+                sendResponse(result !== null ? {result: result} : {error: 'Не удалось решить'});
+            }
         }
+    }
+    
+    // Auto-test messages
+    if (request.action === 'startAutoTest') {
+        AutoTestSolver.solvePage();
+        sendResponse({success: true});
+    }
+    
+    if (request.action === 'stopAutoTest') {
+        AutoTestSolver.stopSolving();
+        sendResponse({success: true});
+    }
+    
+    if (request.action === 'getAutoTestStats') {
+        const stats = AutoTestSolver.getStats();
+        sendResponse(stats);
     }
 });
 
