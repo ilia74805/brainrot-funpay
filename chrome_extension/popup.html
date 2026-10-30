@@ -2,159 +2,293 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Super Calculator</title>
+    <title>Super Calculator Auto-Solve</title>
     <style>
         body {
-            width: 400px;
+            width: 350px;
             padding: 15px;
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: 0;
         }
+        
         .header {
             text-align: center;
-            color: #333;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+            background: #4caf50;
+            box-shadow: 0 0 10px #4caf50;
+        }
+        
+        .status-indicator.off {
+            background: #f44336;
+            box-shadow: 0 0 10px #f44336;
+        }
+        
+        .toggle-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #4CAF50;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
             margin-bottom: 15px;
         }
-        .tabs {
-            display: flex;
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #FFC107 0%, #FF8F00 100%);
+        }
+        
+        .stats {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .manual-section {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 8px;
             margin-bottom: 10px;
         }
+        
+        .manual-section h3 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            padding-bottom: 5px;
+        }
+        
+        .manual-input {
+            width: 100%;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+            background: white;
+            color: black;
+            margin-bottom: 10px;
+        }
+        
+        .manual-result {
+            padding: 8px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 4px;
+            font-size: 14px;
+            white-space: pre-wrap;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        
         .tab {
             flex: 1;
             padding: 8px;
             text-align: center;
-            background: #ddd;
+            background: rgba(255,255,255,0.2);
             border: none;
+            color: white;
             cursor: pointer;
             border-radius: 4px 4px 0 0;
+            font-size: 12px;
         }
+        
         .tab.active {
-            background: #4CAF50;
-            color: white;
+            background: white;
+            color: #667eea;
+            font-weight: bold;
         }
+        
         .tab-content {
             display: none;
-            background: white;
-            padding: 15px;
-            border-radius: 0 0 4px 4px;
         }
+        
         .tab-content.active {
             display: block;
         }
-        input, select {
-            width: 100%;
-            padding: 8px;
-            margin: 5px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+        
+        .feature-list {
+            font-size: 13px;
+            line-height: 1.5;
         }
-        button {
-            width: 100%;
-            padding: 10px;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
+        
+        .feature-list li {
+            margin-bottom: 5px;
+        }
+        
+        .feature-list li:before {
+            content: "✓ ";
+            color: #4CAF50;
+        }
+        
+        .settings-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
             cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover {
-            background: #45a049;
-        }
-        .result {
-            margin-top: 10px;
-            padding: 10px;
-            background: #e9f7ef;
-            border-radius: 4px;
-            white-space: pre-wrap;
-        }
-        .examples {
-            font-size: 12px;
-            color: #666;
-            margin-top: 10px;
+            font-size: 18px;
         }
     </style>
 </head>
 <body>
-    <div class="header">СУПЕР КАЛЬКУЛЯТОР</div>
+    <div class="header">
+        СУПЕР КАЛЬКУЛЯТОР
+        <span class="settings-icon" onclick="showSettings()">⚙️</span>
+    </div>
+    
+    <div class="status">
+        <span class="status-indicator" id="status-indicator"></span>
+        <span id="status-text">Расширение включено</span>
+    </div>
+    
+    <div class="toggle-container">
+        <label class="toggle-switch">
+            <input type="checkbox" id="toggle-switch" checked>
+            <span class="slider"></span>
+        </label>
+    </div>
+    
+    <div class="buttons">
+        <button class="btn btn-primary" onclick="solveAll()">
+            🔍 Найти все задачи
+        </button>
+        <button class="btn btn-warning" onclick="refreshPage()">
+            🔄 Обновить
+        </button>
+    </div>
+    
+    <div class="stats" id="stats">
+        Найдено: <span id="found-count">0</span> выражений
+    </div>
     
     <div class="tabs">
-        <button class="tab active" onclick="showTab('fractions')">Дроби</button>
-        <button class="tab" onclick="showTab('geometry')">Геометрия</button>
-        <button class="tab" onclick="showTab('trig')">Функции</button>
-        <button class="tab" onclick="showTab('equations')">Уравнения</button>
-        <button class="tab" onclick="showTab('units')">Единицы</button>
-        <button class="tab" onclick="showTab('combinatorics')">Комбинаторика</button>
+        <button class="tab active" onclick="showTab('auto')">Авто-режим</button>
+        <button class="tab" onclick="showTab('manual')">Ручной ввод</button>
     </div>
     
-    <!-- Вкладка Дроби -->
-    <div id="fractions" class="tab-content active">
-        <input type="text" id="frac-input" placeholder="1/2 + 3/4">
-        <button onclick="calculateFraction()">Вычислить</button>
-        <div id="frac-result" class="result"></div>
-        <div class="examples">Примеры: 1/2+3/4, 2*(3+1/2)</div>
+    <div id="auto" class="tab-content active">
+        <div class="feature-list">
+            <p><strong>Функции авто-режима:</strong></p>
+            <ul>
+                <li>Автоматическое выделение математических выражений</li>
+                <li>Подсказки при наведении</li>
+                <li>Решение уравнений</li>
+                <li>Геометрия и тригонометрия</li>
+                <li>Перевод единиц</li>
+                <li>Комбинаторика</li>
+                <li>Автозаполнение полей ввода</li>
+            </ul>
+        </div>
     </div>
     
-    <!-- Вкладка Геометрия -->
-    <div id="geometry" class="tab-content">
-        <select id="geo-type">
-            <option value="area">Площадь</option>
-            <option value="volume">Объем</option>
-        </select>
-        <select id="geo-shape">
-            <option value="circle">Круг</option>
-            <option value="square">Квадрат</option>
-            <option value="rectangle">Прямоугольник</option>
-            <option value="triangle">Треугольник</option>
-        </select>
-        <input type="text" id="geo-params" placeholder="Параметры через запятую">
-        <button onclick="calculateGeometry()">Вычислить</button>
-        <div id="geo-result" class="result"></div>
-        <div class="examples">Примеры: круг,5 или прямоугольник,3,4</div>
+    <div id="manual" class="tab-content">
+        <div class="manual-section">
+            <h3>Введите выражение</h3>
+            <input type="text" id="manual-input" class="manual-input" placeholder="Пример: 1/2 + 3/4">
+            <button class="btn btn-primary" onclick="calculateManual()">Вычислить</button>
+            <div id="manual-result" class="manual-result"></div>
+        </div>
     </div>
     
-    <!-- Вкладка Функции -->
-    <div id="trig" class="tab-content">
-        <input type="text" id="trig-input" placeholder="sin(pi/2)">
-        <button onclick="calculateTrig()">Вычислить</button>
-        <div id="trig-result" class="result"></div>
-        <div class="examples">Примеры: sin(pi/2), sqrt(16), log(100,10)</div>
-    </div>
-    
-    <!-- Вкладка Уравнения -->
-    <div id="equations" class="tab-content">
-        <input type="text" id="eq-input" placeholder="x^2 - 4 = 0">
-        <button onclick="solveEquation()">Решить</button>
-        <div id="eq-result" class="result"></div>
-        <div class="examples">Примеры: x^2-4=0, 2x+3=7</div>
-    </div>
-    
-    <!-- Вкладка Единицы -->
-    <div id="units" class="tab-content">
-        <input type="number" id="unit-value" placeholder="Значение" step="any">
-        <input type="text" id="unit-from" placeholder="Из (м, кг, °C)" value="м">
-        <input type="text" id="unit-to" placeholder="В (см, г, °F)" value="см">
-        <button onclick="convertUnits()">Конвертировать</button>
-        <div id="unit-result" class="result"></div>
-        <div class="examples">Примеры: 10 м в см, 100 °C в °F</div>
-    </div>
-    
-    <!-- Вкладка Комбинаторика -->
-    <div id="combinatorics" class="tab-content">
-        <select id="comb-type">
-            <option value="factorial">Факториал</option>
-            <option value="permutations">Перестановки</option>
-            <option value="combinations">Сочетания</option>
-        </select>
-        <input type="number" id="comb-n" placeholder="n">
-        <input type="number" id="comb-k" placeholder="k">
-        <button onclick="calculateCombinatorics()">Вычислить</button>
-        <div id="comb-result" class="result"></div>
-        <div class="examples">Примеры: факториал 5, сочетания 5 3</div>
-    </div>
-    
-    <script src="calculator.js"></script>
+    <script src="popup.js"></script>
 </body>
 </html>
