@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Super Calculator</title>
+    <style>
+        body {
+            width: 400px;
+            padding: 15px;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+        .header {
+            text-align: center;
+            color: #333;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .tab {
+            flex: 1;
+            padding: 8px;
+            text-align: center;
+            background: #ddd;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px 4px 0 0;
+        }
+        .tab.active {
+            background: #4CAF50;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 15px;
+            border-radius: 0 0 4px 4px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background: #e9f7ef;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+        .examples {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">СУПЕР КАЛЬКУЛЯТОР</div>
+    
+    <div class="tabs">
+        <button class="tab active" onclick="showTab('fractions')">Дроби</button>
+        <button class="tab" onclick="showTab('geometry')">Геометрия</button>
+        <button class="tab" onclick="showTab('trig')">Функции</button>
+        <button class="tab" onclick="showTab('equations')">Уравнения</button>
+        <button class="tab" onclick="showTab('units')">Единицы</button>
+        <button class="tab" onclick="showTab('combinatorics')">Комбинаторика</button>
+    </div>
+    
+    <!-- Вкладка Дроби -->
+    <div id="fractions" class="tab-content active">
+        <input type="text" id="frac-input" placeholder="1/2 + 3/4">
+        <button onclick="calculateFraction()">Вычислить</button>
+        <div id="frac-result" class="result"></div>
+        <div class="examples">Примеры: 1/2+3/4, 2*(3+1/2)</div>
+    </div>
+    
+    <!-- Вкладка Геометрия -->
+    <div id="geometry" class="tab-content">
+        <select id="geo-type">
+            <option value="area">Площадь</option>
+            <option value="volume">Объем</option>
+        </select>
+        <select id="geo-shape">
+            <option value="circle">Круг</option>
+            <option value="square">Квадрат</option>
+            <option value="rectangle">Прямоугольник</option>
+            <option value="triangle">Треугольник</option>
+        </select>
+        <input type="text" id="geo-params" placeholder="Параметры через запятую">
+        <button onclick="calculateGeometry()">Вычислить</button>
+        <div id="geo-result" class="result"></div>
+        <div class="examples">Примеры: круг,5 или прямоугольник,3,4</div>
+    </div>
+    
+    <!-- Вкладка Функции -->
+    <div id="trig" class="tab-content">
+        <input type="text" id="trig-input" placeholder="sin(pi/2)">
+        <button onclick="calculateTrig()">Вычислить</button>
+        <div id="trig-result" class="result"></div>
+        <div class="examples">Примеры: sin(pi/2), sqrt(16), log(100,10)</div>
+    </div>
+    
+    <!-- Вкладка Уравнения -->
+    <div id="equations" class="tab-content">
+        <input type="text" id="eq-input" placeholder="x^2 - 4 = 0">
+        <button onclick="solveEquation()">Решить</button>
+        <div id="eq-result" class="result"></div>
+        <div class="examples">Примеры: x^2-4=0, 2x+3=7</div>
+    </div>
+    
+    <!-- Вкладка Единицы -->
+    <div id="units" class="tab-content">
+        <input type="number" id="unit-value" placeholder="Значение" step="any">
+        <input type="text" id="unit-from" placeholder="Из (м, кг, °C)" value="м">
+        <input type="text" id="unit-to" placeholder="В (см, г, °F)" value="см">
+        <button onclick="convertUnits()">Конвертировать</button>
+        <div id="unit-result" class="result"></div>
+        <div class="examples">Примеры: 10 м в см, 100 °C в °F</div>
+    </div>
+    
+    <!-- Вкладка Комбинаторика -->
+    <div id="combinatorics" class="tab-content">
+        <select id="comb-type">
+            <option value="factorial">Факториал</option>
+            <option value="permutations">Перестановки</option>
+            <option value="combinations">Сочетания</option>
+        </select>
+        <input type="number" id="comb-n" placeholder="n">
+        <input type="number" id="comb-k" placeholder="k">
+        <button onclick="calculateCombinatorics()">Вычислить</button>
+        <div id="comb-result" class="result"></div>
+        <div class="examples">Примеры: факториал 5, сочетания 5 3</div>
+    </div>
+    
+    <script src="calculator.js"></script>
+</body>
+</html>
