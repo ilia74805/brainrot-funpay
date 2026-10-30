@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Complex Math Test</title>
+    <style>
+        body { font-family: Arial; max-width: 800px; margin: 50px auto; padding: 20px; }
+        .problem { background: #f5f5f5; padding: 20px; margin: 20px 0; border-radius: 8px; }
+        .answer-box { margin: 15px 0; }
+        .answer-box input { padding: 10px; width: 300px; border: 2px solid #ccc; border-radius: 4px; }
+        .answer-box button { padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .answer-box button:hover { background: #45a049; }
+    </style>
+</head>
+<body>
+    <h1>Сложные математические задачи</h1>
+    
+    <!-- Задача 1: Квадратное уравнение -->
+    <div class="problem">
+        <h3>Задача 1. Квадратное уравнение</h3>
+        <p>Решите уравнение: 2x² - 4x - 6 = 0</p>
+        <div class="answer-box">
+            <input type="text" id="ans1" placeholder="Введите корни через запятую" />
+            <button onclick="checkAnswer('ans1', '3,-1')">Ответить</button>
+        </div>
+    </div>
+
+    <!-- Задача 2: Сложная текстовая задача -->
+    <div class="problem">
+        <h3>Задача 2. Текстовая задача на движение</h3>
+        <p>Два пешехода вышли одновременно из одного пункта в одном направлении. Скорость первого пешехода 5 км/ч, а второго 7 км/ч. Какое расстояние будет между ними через 3 часа?</p>
+        <div class="answer-box">
+            <input type="text" id="ans2" placeholder="Введите расстояние в км" />
+            <button onclick="checkAnswer('ans2', '6')">Ответить</button>
+        </div>
+    </div>
+
+    <!-- Задача 3: Геометрия -->
+    <div class="problem">
+        <h3>Задача 3. Площадь сложной фигуры</h3>
+        <p>Найдите площадь прямоугольного треугольника, если его катеты равны 6 см и 8 см.</p>
+        <div class="answer-box">
+            <input type="text" id="ans3" placeholder="Введите площадь в см²" />
+            <button onclick="checkAnswer('ans3', '24')">Ответить</button>
+        </div>
+    </div>
+
+    <!-- Задача 4: Прогрессия (как у Пети) -->
+    <div class="problem">
+        <h3>Задача 4. Арифметическая прогрессия</h3>
+        <p>Среднее арифметическое чисел возрастает на 3 после каждого нового числа. На сколько 1000-е число больше первого?</p>
+        <div class="answer-box">
+            <input type="text" id="ans4" placeholder="Введите разницу" />
+            <button onclick="checkAnswer('ans4', '5994')">Ответить</button>
+        </div>
+    </div>
+
+    <!-- Задача 5: Сложное выражение -->
+    <div class="problem">
+        <h3>Задача 5. Сложное выражение</h3>
+        <p>Вычислите: (2 + 3) * (4 - 1) / 5 + sin(30°)</p>
+        <div class="answer-box">
+            <input type="text" id="ans5" placeholder="Введите результат" />
+            <button onclick="checkAnswer('ans5', '3.5')">Ответить</button>
+        </div>
+    </div>
+
+    <!-- Задача 6: Система уравнений -->
+    <div class="problem">
+        <h3>Задача 6. Система уравнений</h3>
+        <p>Решите систему: { x + y = 10, 2x - y = 2 }</p>
+        <div class="answer-box">
+            <input type="text" id="ans6" placeholder="Введите x и y через запятую" />
+            <button onclick="checkAnswer('ans6', '4,6')">Ответить</button>
+        </div>
+    </div>
+
+    <!-- Задача 7: Проценты -->
+    <div class="problem">
+        <h3>Задача 7. Проценты</h3>
+        <p>Цена товара повысилась на 20%, затем понизилась на 20%. На сколько процентов изменилась цена по сравнению с первоначальной?</p>
+        <div class="answer-box">
+            <input type="text" id="ans7" placeholder="Введите процент изменения" />
+            <button onclick="checkAnswer('ans7', '-4')">Ответить</button>
+        </div>
+    </div>
+
+    <script>
+        function checkAnswer(id, correct) {
+            const input = document.getElementById(id);
+            const answer = input.value.trim();
+            if (answer === correct) {
+                alert('✅ Правильно!');
+                input.style.borderColor = '#4CAF50';
+            } else {
+                alert('❌ Неправильно! Правильный ответ: ' + correct);
+                input.style.borderColor = '#f44336';
+            }
+        }
+    </script>
+</body>
+</html>

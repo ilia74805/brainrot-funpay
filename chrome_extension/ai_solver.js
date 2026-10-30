@@ -2,6 +2,36 @@
 // This module attempts to solve ANY problem using multiple strategies
 
 const AISolver = {
+    // Enhanced NLP understanding for complex problems
+    understanding: {
+        // Subject detection
+        detectSubject: function(text) {
+            const lower = text.toLowerCase();
+            if (lower.includes('уравн') || lower.includes('реши') || lower.includes('вычисли') || lower.includes('найти') || /[\d\+\-\*\/\^=()\s]+/.test(lower)) return 'math';
+            if (lower.includes('биол') || lower.includes('клетк') || lower.includes('днк') || lower.includes('орган')) return 'biology';
+            if (lower.includes('физик') || lower.includes('скорость') || lower.includes('сила') || lower.includes('график') || lower.includes('движ')) return 'physics';
+            if (lower.includes('хими') || lower.includes('реакц') || lower.includes('моль') || lower.includes('веществ')) return 'chemistry';
+            if (lower.includes('вероятн') || lower.includes('статистик') || lower.includes('комбинатор') || lower.includes('средн')) return 'statistics';
+            if (lower.includes('истори') || lower.includes('год') || lower.includes('событи')) return 'history';
+            return 'general';
+        },
+        
+        // Extract all numbers from text
+        extractNumbers: function(text) {
+            const numbers = text.match(/[\d\.\,]+/g) || [];
+            return numbers.map(n => {
+                const num = parseFloat(n.replace(',', '.'));
+                return isNaN(num) ? null : num;
+            }).filter(n => n !== null);
+        },
+        
+        // Extract units
+        extractUnits: function(text) {
+            const units = text.match(/([\u0430-\u044f\w]+)\s*(?:км|м|см|ч|мин|с|кг|г|л|мл|°|\%|\$|€)/gi) || [];
+            return units.map(u => u.trim().toLowerCase());
+        }
+    },
+    
     // Strategy 1: Pattern-based solving (fast, deterministic)
     patternSolver: typeof TextTaskParser !== 'undefined' ? TextTaskParser : null,
     
@@ -71,8 +101,8 @@ const AISolver = {
         const cleanText = text.toLowerCase().replace(/[.,;!?]/g, '');
         
         // Extract all numbers
-        const numbers = text.match(/[\d\.\,]+/g) || [];
-        const nums = numbers.map(n => parseFloat(n.replace(',', '.')));
+        const numbers = this.understanding.extractNumbers(text);
+        const nums = numbers;
         
         // Extract keywords
         const keywords = cleanText.split(/\s+/);
@@ -82,6 +112,37 @@ const AISolver = {
         
         if (problemType && nums.length > 0) {
             return this.solveByType(problemType, nums, text);
+        }
+        
+        // Try complex problem solving
+        const complexSolution = this.solveComplexProblem(text, cleanText, nums);
+        if (complexSolution) {
+            return complexSolution;
+        }
+        
+        return null;
+    },
+    
+    // Enhanced complex problem solver
+    solveComplexProblem: function(text, cleanText, numbers) {
+        // Try movement problems
+        if (cleanText.includes('скорость') || cleanText.includes('движ') || cleanText.includes('пешеход') || cleanText.includes('speed') || cleanText.includes('mov')) {
+            return this.solveMovementProblem(text, cleanText, numbers);
+        }
+        
+        // Try percentage problems
+        if (cleanText.includes('процент') || cleanText.includes('увелич') || cleanText.includes('уменьш') || cleanText.includes('percent') || cleanText.includes('%')) {
+            return this.solvePercentageProblem(text, cleanText, numbers);
+        }
+        
+        // Try geometry problems
+        if (cleanText.includes('площадь') || cleanText.includes('объем') || cleanText.includes('треугольник') || cleanText.includes('круг') || cleanText.includes('прямоугольник') || cleanText.includes('area') || cleanText.includes('volume')) {
+            return this.solveGeometryProblem(text, cleanText, numbers);
+        }
+        
+        // Try system of equations
+        if (cleanText.includes('система') || cleanText.includes('уравнение') && cleanText.includes('и') || cleanText.includes('system') || (cleanText.includes('{') && cleanText.includes('}'))) {
+            return this.solveSystemProblem(text, cleanText, numbers);
         }
         
         return null;
@@ -699,6 +760,222 @@ const AISolver = {
     // Logarithms
     logBase: function(x, base) {
         return Math.log(x) / Math.log(base);
+    },
+    
+    // Complex problem solvers
+    solveMovementProblem: function(text, cleanText, numbers) {
+        // Extract speeds and times from text
+        const speedMatches = text.match(/([\d\.\,]+)\s*(?:км\/ч|м\/с|км\/с|speed|скорость|v\s*=\s*)/gi) || [];
+        const timeMatches = text.match(/([\d\.\,]+)\s*(?:ч|мин|с|hour|min|sec|время|t\s*=\s*)/gi) || [];
+        
+        const speeds = speedMatches.map(m => {
+            const num = m.match(/[\d\.\,]+/)?.[0];
+            return num ? parseFloat(num.replace(',', '.')) : null;
+        }).filter(n => n !== null);
+        
+        const times = timeMatches.map(m => {
+            const num = m.match(/[\d\.\,]+/)?.[0];
+            return num ? parseFloat(num.replace(',', '.')) : null;
+        }).filter(n => n !== null);
+        
+        // Case 1: Two objects moving, find distance between them
+        if (speeds.length >= 2 && times.length >= 1) {
+            const v1 = speeds[0], v2 = speeds[1];
+            const t = times[0];
+            const distance = Math.abs(v2 - v1) * t;
+            return {
+                result: distance,
+                type: 'movement',
+                description: `v₁ = ${v1} км/ч, v₂ = ${v2} км/ч, t = ${t} ч\nРасстояние = |v₂ - v₁| × t = ${distance} км`,
+                confidence: 0.95
+            };
+        }
+        
+        // Case 2: Same direction movement
+        if (cleanText.includes('одном направлении') || cleanText.includes('same direction')) {
+            if (speeds.length >= 2 && times.length >= 1) {
+                const v1 = speeds[0], v2 = speeds[1];
+                const t = times[0];
+                const distance = Math.abs(v2 - v1) * t;
+                return {
+                    result: distance,
+                    type: 'movement',
+                    description: `Движение в одном направлении:\nv₁ = ${v1} км/ч, v₂ = ${v2} км/ч, t = ${t} ч\nРасстояние между ними = |v₂ - v₁| × t = ${distance} км`,
+                    confidence: 0.95
+                };
+            }
+        }
+        
+        // Case 3: Opposite direction movement
+        if (cleanText.includes('навстречу') || cleanText.includes('в противоположных') || cleanText.includes('towards each other') || cleanText.includes('opposite direction')) {
+            if (speeds.length >= 2 && times.length >= 1) {
+                const v1 = speeds[0], v2 = speeds[1];
+                const t = times[0];
+                const distance = (v1 + v2) * t;
+                return {
+                    result: distance,
+                    type: 'movement',
+                    description: `Движение навстречу:\nv₁ = ${v1} км/ч, v₂ = ${v2} км/ч, t = ${t} ч\nРасстояние = (v₁ + v₂) × t = ${distance} км`,
+                    confidence: 0.95
+                };
+            }
+        }
+        
+        return null;
+    },
+    
+    solvePercentageProblem: function(text, cleanText, numbers) {
+        // Case 1: Price increase then decrease
+        if ((cleanText.includes('повысилась') || cleanText.includes('увеличилась') || cleanText.includes('increased')) &&
+            (cleanText.includes('понизилась') || cleanText.includes('уменьшилась') || cleanText.includes('decreased'))) {
+            if (numbers.length >= 2) {
+                const p1 = numbers[0], p2 = numbers[1];
+                const finalChange = - (p1 * p2) / 100;
+                return {
+                    result: finalChange,
+                    type: 'percentage',
+                    description: `Цена изменилась на ${p1}%, затем на -${p2}%\nОбщее изменение = -(${p1} × ${p2}) / 100 = ${finalChange}%`,
+                    confidence: 0.9
+                };
+            }
+        }
+        
+        // Case 2: Find percentage of number
+        if ((cleanText.includes('процент') || cleanText.includes('%') || cleanText.includes('percent')) &&
+            (cleanText.includes('от') || cleanText.includes('of'))) {
+            if (numbers.length >= 2) {
+                const percent = numbers[0], value = numbers[1];
+                const result = (percent / 100) * value;
+                return {
+                    result: result,
+                    type: 'percentage',
+                    description: `${percent}% от ${value} = ${result}`,
+                    confidence: 0.95
+                };
+            }
+        }
+        
+        // Case 3: Find what percentage is
+        if ((cleanText.includes('сколько процентов') || cleanText.includes('what percent') || cleanText.includes('какой процент'))) {
+            if (numbers.length >= 2) {
+                const part = numbers[0], whole = numbers[1];
+                const result = (part / whole) * 100;
+                return {
+                    result: result,
+                    type: 'percentage',
+                    description: `${part} от ${whole} = ${result.toFixed(2)}%`,
+                    confidence: 0.9
+                };
+            }
+        }
+        
+        return null;
+    },
+    
+    solveGeometryProblem: function(text, cleanText, numbers) {
+        // Case 1: Right triangle area
+        if ((cleanText.includes('прямоугольный треугольник') || cleanText.includes('right triangle') || cleanText.includes('прямоугольн')) &&
+            (cleanText.includes('катет') || cleanText.includes('leg') || cleanText.includes('сторона'))) {
+            if (numbers.length >= 2) {
+                const a = numbers[0], b = numbers[1];
+                const area = (a * b) / 2;
+                return {
+                    result: area,
+                    type: 'geometry',
+                    description: `Прямоугольный треугольник с катетами ${a} и ${b}\nПлощадь = (a × b) / 2 = ${area}`,
+                    confidence: 0.95
+                };
+            }
+        }
+        
+        // Case 2: Circle area or circumference
+        if (cleanText.includes('круг') || cleanText.includes('circle') || cleanText.includes('окружность')) {
+            if (numbers.length >= 1) {
+                const r = numbers[0];
+                const area = Math.PI * r * r;
+                const circumference = 2 * Math.PI * r;
+                return {
+                    result: area,
+                    type: 'geometry',
+                    description: `Круг с радиусом ${r}\nПлощадь = πr² = ${area.toFixed(2)}\nДлина окружности = 2πr = ${circumference.toFixed(2)}`,
+                    confidence: 0.9
+                };
+            }
+        }
+        
+        // Case 3: Rectangle area
+        if ((cleanText.includes('прямоугольник') || cleanText.includes('rectangle')) &&
+            (cleanText.includes('длина') || cleanText.includes('ширина') || cleanText.includes('length') || cleanText.includes('width'))) {
+            if (numbers.length >= 2) {
+                const a = numbers[0], b = numbers[1];
+                const area = a * b;
+                const perimeter = 2 * (a + b);
+                return {
+                    result: area,
+                    type: 'geometry',
+                    description: `Прямоугольник ${a} × ${b}\nПлощадь = ${area}\nПериметр = ${perimeter}`,
+                    confidence: 0.9
+                };
+            }
+        }
+        
+        return null;
+    },
+    
+    solveSystemProblem: function(text, cleanText, numbers) {
+        // Case 1: Simple 2x2 system like { x + y = a, x - y = b }
+        const systemMatch = text.match(/\{([^}]+)\}/);
+        if (systemMatch) {
+            const equations = systemMatch[1].split(/[,\s]+/);
+            if (equations.length >= 2) {
+                // Try to parse equations like "x + y = 10" and "2x - y = 2"
+                const eq1Match = equations[0].match(/([\d\-]?)x([\+\-][\d\-]?)y\s*=\s*([\d\-]+)/);
+                const eq2Match = equations[1].match(/([\d\-]?)x([\+\-][\d\-]?)y\s*=\s*([\d\-]+)/);
+                
+                if (eq1Match && eq2Match) {
+                    const a1 = parseFloat(eq1Match[1] || '1');
+                    const b1 = parseFloat(eq1Match[2] || '1');
+                    const c1 = parseFloat(eq1Match[3]);
+                    const a2 = parseFloat(eq2Match[1] || '1');
+                    const b2 = parseFloat(eq2Match[2] || '1');
+                    const c2 = parseFloat(eq2Match[3]);
+                    
+                    // Solve system: a1x + b1y = c1, a2x + b2y = c2
+                    const det = a1 * b2 - a2 * b1;
+                    if (det !== 0) {
+                        const x = (c1 * b2 - c2 * b1) / det;
+                        const y = (a1 * c2 - a2 * c1) / det;
+                        return {
+                            result: `${x.toFixed(2)},${y.toFixed(2)}`,
+                            type: 'system',
+                            description: `Решение системы:\n${a1}x ${b1 > 0 ? '+' : ''}${b1}y = ${c1}\n${a2}x ${b2 > 0 ? '+' : ''}${b2}y = ${c2}\nx = ${x.toFixed(2)}, y = ${y.toFixed(2)}`,
+                            confidence: 0.9
+                        };
+                    }
+                }
+            }
+        }
+        
+        // Case 2: Simple system without braces
+        if (cleanText.includes('и') || cleanText.includes('and')) {
+            const plusMatch = text.match(/x\s*[\+\-]\s*y\s*=\s*([\d\-]+)/);
+            const minusMatch = text.match(/x\s*[\+\-]\s*y\s*=\s*([\d\-]+)/);
+            
+            if (plusMatch && minusMatch) {
+                const sum = parseFloat(plusMatch[1]);
+                const diff = parseFloat(minusMatch[1]);
+                const x = (sum + diff) / 2;
+                const y = (sum - diff) / 2;
+                return {
+                    result: `${x},${y}`,
+                    type: 'system',
+                    description: `x + y = ${sum}\nx - y = ${diff}\nРешение: x = ${x}, y = ${y}`,
+                    confidence: 0.85
+                };
+            }
+        }
+        
+        return null;
     }
 };
 

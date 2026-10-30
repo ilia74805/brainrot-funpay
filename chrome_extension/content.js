@@ -331,6 +331,51 @@ function autoFillInputs() {
             }
         }
     });
+    
+    // Auto-fill empty inputs by analyzing nearby text
+    document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(input => {
+        if (!input.value.trim() && !input.dataset.filled) {
+            const questionText = this.getNearbyQuestionText(input);
+            if (questionText) {
+                const solution = AISolver.solve(questionText);
+                if (solution && solution.result !== null && solution.result !== undefined) {
+                    input.value = solution.result;
+                    input.dataset.filled = 'true';
+                    // Trigger change events
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            }
+        }
+    });
+}
+
+// Get question text near an input field
+function getNearbyQuestionText(input) {
+    // Look for text in parent elements
+    let parent = input.parentElement;
+    for (let i = 0; i < 3; i++) {
+        if (parent) {
+            const text = parent.textContent;
+            if (text.trim().length > 10 && text.includes('?') || 
+                /[\d\+\-\*\/\^=()\s\u0430-\u044f]+/.test(text)) {
+                return text;
+            }
+            parent = parent.parentElement;
+        }
+    }
+    
+    // Look for previous sibling elements
+    let prev = input.previousElementSibling;
+    for (let i = 0; i < 5 && prev; i++) {
+        const text = prev.textContent;
+        if (text.trim().length > 10) {
+            return text;
+        }
+        prev = prev.previousElementSibling;
+    }
+    
+    return null;
 }
 
 function init() {
@@ -370,14 +415,80 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === 'solveSelection') {
         const aiSolution = AISolver.solve(request.text);
         if (aiSolution) {
-            sendResponse({result: aiSolution.result, description: aiSolution.description, strategy: aiSolution.strategy});
+            sendResponse({result: aiSolution.result, description: aiSolution.description, strategy: aiSolution.strategy, confidence: aiSolution.confidence});
         } else {
-            const solution = TextTaskParser.parse(request.text);
+            const solution = typeof TextTaskParser !== 'undefined' ? TextTaskParser.parse(request.text) : null;
             if (solution) sendResponse({result: solution.result, description: solution.description});
             else {
                 const result = Calculator.evaluate(request.text);
                 sendResponse(result !== null ? {result: result} : {error: 'Не удалось решить'});
             }
+        }
+    }
+    
+    // Auto-submit answers
+    if (request.action === 'submitAnswers') {
+        const allButtons = document.querySelectorAll('button, input[type="button"], input[type="submit"]');
+        for (const btn of allButtons) {
+            const btnText = (btn.textContent || btn.value || '').toLowerCase();
+            if (btnText.includes('ответить') || btnText.includes('submit') || btnText.includes('проверка') || btnText.includes('check') || btnText.includes('отправить')) {
+                btn.click();
+                sendResponse({submitted: true});
+                return;
+            }
+        }
+        sendResponse({submitted: false, error: 'Submit button not found'});
+    }
+    
+    // Click element by selector or coordinates
+    if (request.action === 'clickElement') {
+        if (request.selector) {
+            const element = document.querySelector(request.selector);
+            if (element) {
+                element.click();
+                sendResponse({clicked: true});
+            } else {
+                sendResponse({clicked: false, error: 'Element not found'});
+            }
+        } else if (request.x && request.y) {
+            const event = new MouseEvent('click', {
+                view: window,
+                bubbles: true,
+                cancelable: true,
+                clientX: request.x,
+                clientY: request.y
+            });
+            const element = document.elementFromPoint(request.x, request.y);
+            if (element) {
+                element.dispatchEvent(event);
+                sendResponse({clicked: true});
+            } else {
+                sendResponse({clicked: false, error: 'No element at coordinates'});
+            }
+        }
+    }
+    
+    // Fill input and submit
+    if (request.action === 'fillAndSubmit') {
+        const input = document.querySelector(request.selector);
+        if (input) {
+            input.value = request.value;
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+            
+            setTimeout(() => {
+                const allButtons = document.querySelectorAll('button, input[type="button"], input[type="submit"]');
+                for (const btn of allButtons) {
+                    const btnText = (btn.textContent || btn.value || '').toLowerCase();
+                    if (btnText.includes('ответить') || btnText.includes('submit')) {
+                        btn.click();
+                        break;
+                    }
+                }
+            }, 500);
+            sendResponse({filled: true});
+        } else {
+            sendResponse({filled: false, error: 'Input not found'});
         }
     }
     
