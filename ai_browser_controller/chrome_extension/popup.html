@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Mr. 7B - ИИ Умный Браузер</title>
+    <style>
+        body {
+            width: 350px;
+            padding: 15px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            margin: 0;
+        }
+        
+        .header {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+            background: #10b981;
+            box-shadow: 0 0 10px #10b981;
+        }
+        
+        .status-indicator.off {
+            background: #ef4444;
+            box-shadow: 0 0 10px #ef4444;
+        }
+        
+        .status-indicator.warning {
+            background: #f59e0b;
+            box-shadow: 0 0 10px #f59e0b;
+        }
+        
+        .toggle-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #10b981;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+        
+        .btn-info {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+        
+        .stats {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .feature-list {
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        .feature-list li {
+            margin-bottom: 5px;
+        }
+        
+        .feature-list li:before {
+            content: "✓ ";
+            color: #10b981;
+        }
+        
+        .settings-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .ai-status {
+            font-size: 12px;
+            text-align: center;
+            margin-top: 10px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        Mr. 7B
+        <span class="settings-icon" onclick="openSettings()">⚙️</span>
+    </div>
+    
+    <div class="status">
+        <span class="status-indicator" id="status-indicator"></span>
+        <span id="status-text">Загрузка...</span>
+        <span class="loading" id="loading-spinner"></span>
+    </div>
+    
+    <div class="ai-status" id="ai-status">ИИ: не подключён</div>
+    
+    <div class="toggle-container">
+        <label class="toggle-switch">
+            <input type="checkbox" id="toggle-switch" checked>
+            <span class="slider"></span>
+        </label>
+    </div>
+    
+    <div class="buttons">
+        <button class="btn btn-primary" onclick="startAutoSolve()">
+            🚀 Авто-решение
+        </button>
+    </div>
+    
+    <div class="buttons">
+        <button class="btn btn-info" onclick="analyzePage()">
+            🔍 Проанализировать страницу
+        </button>
+    </div>
+    
+    <div class="buttons">
+        <button class="btn btn-warning" onclick="connectToAI()">
+            🤖 Подключить ИИ
+        </button>
+    </div>
+    
+    <div class="stats" id="stats">
+        Готов к работе!
+    </div>
+    
+    <div class="feature-list">
+        <p><strong>Возможности:</strong></p>
+        <ul>
+            <li>Анализ страниц с ИИ</li>
+            <li>Авто-решение задач</li>
+            <li>Заполнение форм</li>
+            <li>Управление браузером</li>
+            <li>Локальная модель (офилайн)</li>
+            <li>Поддержка всех предметов</li>
+        </ul>
+    </div>
+    
+    <script src="popup.js"></script>
+</body>
+</html>

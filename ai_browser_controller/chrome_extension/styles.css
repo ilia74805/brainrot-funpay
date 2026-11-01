@@ -1,0 +1,117 @@
+/* Mr. 7B Styles */
+
+/* Выделение вопросов */
+.mr7b-question {
+    background: linear-gradient(135deg, rgba(30, 58, 138, 0.2), rgba(59, 130, 246, 0.2));
+    border-left: 4px solid #3b82f6;
+    padding: 8px 12px;
+    margin: 5px 0;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.mr7b-question:hover {
+    background: linear-gradient(135deg, rgba(30, 58, 138, 0.4), rgba(59, 130, 246, 0.4));
+    transform: translateX(5px);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.mr7b-question.solved {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2));
+    border-left-color: #10b981;
+}
+
+/* Уведомления */
+.mr7b-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 10px;
+    z-index: 999999;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    animation: mr7b-fadeIn 0.3s, mr7b-fadeOut 0.3s 3s;
+}
+
+@keyframes mr7b-fadeIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes mr7b-fadeOut {
+    from { opacity: 1; transform: translateX(0); }
+    to { opacity: 0; transform: translateX(20px); }
+}
+
+/* Подсветка полей ввода */
+.mr7b-input-highlight {
+    background: rgba(59, 130, 246, 0.1) !important;
+    border: 2px solid #3b82f6 !important;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.3) !important;
+}
+
+/* Анимация загрузки */
+.mr7b-loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #3b82f6;
+    animation: mr7b-spin 1s ease-in-out infinite;
+}
+
+@keyframes mr7b-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Подсказки */
+.mr7b-tooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    z-index: 999999;
+    max-width: 300px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.mr7b-tooltip:after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent;
+}
+
+/* Выделение решённых элементов */
+.mr7b-solved {
+    background: rgba(16, 185, 129, 0.1) !important;
+    border: 1px solid #10b981 !important;
+}
+
+/* Кнопки Mr. 7B */
+.mr7b-btn {
+    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.mr7b-btn:hover {
+    background: linear-gradient(135deg, #3b82f6, #1e40af);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+}
