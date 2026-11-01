@@ -1,32 +1,29 @@
 /**
- * Options Script для Mr. 7B
- * Управляет настройками расширения
+ * Mr. 7B - Options Script
+ * Professional settings management for AI Browser Controller
  */
 
-// Загрузка настроек при старте
-document.addEventListener('DOMContentLoaded', function() {
-    loadSettings();
-    setupTabs();
-    setupEventListeners();
-    loadSystemInfo();
-    loadHistory();
-});
-
-// Настройки по умолчанию
+// Default settings
 const DEFAULT_SETTINGS = {
-    // Общие настройки
+    // General settings
     extensionEnabled: true,
     language: 'ru',
     theme: 'system',
+    popupWidth: 300,
+    fontSize: 'medium',
     
-    // ИИ и модели
+    // AI settings
     aiServerUrl: 'http://localhost:3000',
     aiModel: 'phi-2',
     temperature: 0.7,
     maxLength: 500,
     confidenceThreshold: 0.7,
+    enableOCR: true,
+    enableComplexAnalysis: true,
+    enableAutoSolve: true,
+    enableRealTime: true,
     
-    // Поведение
+    // Behavior settings
     mode: 'auto',
     autoFillInputs: true,
     autoClickButtons: true,
@@ -35,8 +32,12 @@ const DEFAULT_SETTINGS = {
     showNotifications: true,
     playSounds: true,
     notificationDuration: 3,
+    defaultPlatform: 'auto',
+    delayBetweenActions: 500,
+    processAllTabs: true,
+    maxConcurrentTasks: 3,
     
-    // Контекст
+    // Context settings
     defaultSubject: 'auto',
     contextTemplate: 'Ты - опытный учитель. Отвечай подробно и с пояснениями. Используй русский язык.',
     userContext: '',
@@ -45,92 +46,159 @@ const DEFAULT_SETTINGS = {
     priorityBiology: true,
     priorityChemistry: true,
     priorityHistory: true,
+    priorityInformatics: true,
+    priorityLanguages: true,
+    priorityStatistics: true,
+    detectMathProblems: true,
+    detectTextProblems: true,
+    detectMultipleChoice: true,
+    detectOpenQuestions: true,
     
-    // Производительность
+    // Performance settings
     performanceMode: 'balanced',
-    enableOCR: true,
-    enableComplexAnalysis: true,
-    enableAutoSolve: true,
-    enableRealTime: true,
-    maxConcurrentTasks: 3,
-    cacheSize: 100
+    enableCache: true,
+    cacheSize: 100,
+    lazyLoading: true,
+    minimizeDOM: true,
+    batchProcessing: true
 };
 
-// Загрузка настроек
+// Current settings
+let currentSettings = { ...DEFAULT_SETTINGS };
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    loadSettings();
+    setupTabs();
+    setupEventListeners();
+    loadSystemInfo();
+    loadHistory();
+    setupTheme();
+});
+
+// Load settings from storage
 function loadSettings() {
     chrome.storage.sync.get(null, function(data) {
-        // Применяем настройки или используем значения по умолчанию
-        const settings = { ...DEFAULT_SETTINGS, ...data };
-        
-        // Общие настройки
-        document.getElementById('extensionEnabled').checked = settings.extensionEnabled;
-        document.getElementById('language').value = settings.language;
-        document.getElementById('theme').value = settings.theme;
-        
-        // ИИ и модели
-        document.getElementById('aiServerUrl').value = settings.aiServerUrl;
-        document.getElementById('aiModel').value = settings.aiModel;
-        
-        // Параметры ИИ
-        document.getElementById('temperature').value = settings.temperature;
-        document.getElementById('temperatureValue').textContent = settings.temperature;
-        
-        document.getElementById('maxLength').value = settings.maxLength;
-        document.getElementById('maxLengthValue').textContent = settings.maxLength;
-        
-        document.getElementById('confidenceThreshold').value = settings.confidenceThreshold;
-        document.getElementById('confidenceThresholdValue').textContent = Math.round(settings.confidenceThreshold * 100) + '%';
-        
-        // Поведение
-        document.querySelector(`input[name="mode"][value="${settings.mode}"]`).checked = true;
-        document.getElementById('autoFillInputs').checked = settings.autoFillInputs;
-        document.getElementById('autoClickButtons').checked = settings.autoClickButtons;
-        document.getElementById('autoSubmitForms').checked = settings.autoSubmitForms;
-        document.getElementById('autoNavigate').checked = settings.autoNavigate;
-        document.getElementById('showNotifications').checked = settings.showNotifications;
-        document.getElementById('playSounds').checked = settings.playSounds;
-        document.getElementById('notificationDuration').value = settings.notificationDuration;
-        document.getElementById('notificationDurationValue').textContent = settings.notificationDuration;
-        
-        // Контекст
-        document.getElementById('defaultSubject').value = settings.defaultSubject;
-        document.getElementById('contextTemplate').value = settings.contextTemplate;
-        document.getElementById('userContext').value = settings.userContext;
-        document.getElementById('priorityMath').checked = settings.priorityMath;
-        document.getElementById('priorityPhysics').checked = settings.priorityPhysics;
-        document.getElementById('priorityBiology').checked = settings.priorityBiology;
-        document.getElementById('priorityChemistry').checked = settings.priorityChemistry;
-        document.getElementById('priorityHistory').checked = settings.priorityHistory;
-        
-        // Производительность
-        document.getElementById('performanceMode').value = settings.performanceMode;
-        updatePerformanceSettings();
-        document.getElementById('enableOCR').checked = settings.enableOCR;
-        document.getElementById('enableComplexAnalysis').checked = settings.enableComplexAnalysis;
-        document.getElementById('enableAutoSolve').checked = settings.enableAutoSolve;
-        document.getElementById('enableRealTime').checked = settings.enableRealTime;
-        document.getElementById('maxConcurrentTasks').value = settings.maxConcurrentTasks;
-        document.getElementById('maxConcurrentTasksValue').textContent = settings.maxConcurrentTasks;
-        document.getElementById('cacheSize').value = settings.cacheSize;
-        document.getElementById('cacheSizeValue').textContent = settings.cacheSize + 'MB';
-        
-        // Проверяем подключение к ИИ
+        currentSettings = { ...DEFAULT_SETTINGS, ...data };
+        populateForm();
         checkAIConnection();
     });
 }
 
-// Настройка вкладок
+// Populate form with current settings
+function populateForm() {
+    const s = currentSettings;
+    
+    // General tab
+    setCheckbox('extensionEnabled', s.extensionEnabled);
+    setSelect('language', s.language);
+    setSelect('theme', s.theme);
+    setInput('popupWidth', s.popupWidth);
+    setSelect('fontSize', s.fontSize);
+    
+    // Notifications
+    setCheckbox('showNotifications', s.showNotifications);
+    setCheckbox('playSounds', s.playSounds);
+    setRange('notificationDuration', s.notificationDuration, s.notificationDuration);
+    
+    // AI tab
+    setInput('aiServerUrl', s.aiServerUrl);
+    setSelect('aiModel', s.aiModel);
+    setRange('temperature', s.temperature, s.temperature);
+    setRange('maxLength', s.maxLength, s.maxLength);
+    setRange('confidenceThreshold', s.confidenceThreshold, Math.round(s.confidenceThreshold * 100) + '%');
+    setCheckbox('enableOCR', s.enableOCR);
+    setCheckbox('enableComplexAnalysis', s.enableComplexAnalysis);
+    setCheckbox('enableAutoSolve', s.enableAutoSolve);
+    setCheckbox('enableRealTime', s.enableRealTime);
+    
+    // Behavior tab
+    setRadio('mode', s.mode);
+    setCheckbox('autoFillInputs', s.autoFillInputs);
+    setCheckbox('autoClickButtons', s.autoClickButtons);
+    setCheckbox('autoSubmitForms', s.autoSubmitForms);
+    setCheckbox('autoNavigate', s.autoNavigate);
+    setSelect('defaultPlatform', s.defaultPlatform);
+    setInput('delayBetweenActions', s.delayBetweenActions);
+    setCheckbox('processAllTabs', s.processAllTabs);
+    setRange('maxConcurrentTasks', s.maxConcurrentTasks, s.maxConcurrentTasks);
+    
+    // Context tab
+    setSelect('defaultSubject', s.defaultSubject);
+    setTextarea('contextTemplate', s.contextTemplate);
+    setTextarea('userContext', s.userContext);
+    setCheckbox('priorityMath', s.priorityMath);
+    setCheckbox('priorityPhysics', s.priorityPhysics);
+    setCheckbox('priorityBiology', s.priorityBiology);
+    setCheckbox('priorityChemistry', s.priorityChemistry);
+    setCheckbox('priorityHistory', s.priorityHistory);
+    setCheckbox('priorityInformatics', s.priorityInformatics);
+    setCheckbox('priorityLanguages', s.priorityLanguages);
+    setCheckbox('priorityStatistics', s.priorityStatistics);
+    setCheckbox('detectMathProblems', s.detectMathProblems);
+    setCheckbox('detectTextProblems', s.detectTextProblems);
+    setCheckbox('detectMultipleChoice', s.detectMultipleChoice);
+    setCheckbox('detectOpenQuestions', s.detectOpenQuestions);
+    
+    // Performance tab
+    setRadio('performanceMode', s.performanceMode);
+    setCheckbox('enableCache', s.enableCache);
+    setRange('cacheSize', s.cacheSize, s.cacheSize);
+    setCheckbox('lazyLoading', s.lazyLoading);
+    setCheckbox('minimizeDOM', s.minimizeDOM);
+    setCheckbox('batchProcessing', s.batchProcessing);
+    
+    // Update performance settings based on mode
+    updatePerformancePreset();
+}
+
+// Helper functions for setting form values
+function setCheckbox(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.checked = value;
+}
+
+function setSelect(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.value = value;
+}
+
+function setInput(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.value = value;
+}
+
+function setTextarea(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.value = value;
+}
+
+function setRange(id, value, displayValue) {
+    const el = document.getElementById(id);
+    const displayEl = document.getElementById(id + 'Value');
+    if (el) el.value = value;
+    if (displayEl) displayEl.textContent = displayValue;
+}
+
+function setRadio(name, value) {
+    const radios = document.querySelectorAll(`input[name="${name}"]`);
+    radios.forEach(radio => {
+        if (radio.value === value) radio.checked = true;
+    });
+}
+
+// Setup tab switching
 function setupTabs() {
-    const tabs = document.querySelectorAll('.nav-tab');
+    const tabs = document.querySelectorAll('.tab-btn');
     const contents = document.querySelectorAll('.tab-content');
     
     tabs.forEach(tab => {
         tab.addEventListener('click', function() {
-            // Удаляем активный класс у всех вкладок
+            // Remove active class from all tabs and contents
             tabs.forEach(t => t.classList.remove('active'));
             contents.forEach(c => c.classList.remove('active'));
             
-            // Добавляем активный класс к выбранной вкладке
+            // Add active class to clicked tab and corresponding content
             this.classList.add('active');
             const tabId = this.getAttribute('data-tab');
             document.getElementById(tabId).classList.add('active');
@@ -138,84 +206,162 @@ function setupTabs() {
     });
 }
 
-// Настройка обработчиков событий
+// Setup all event listeners
 function setupEventListeners() {
-    // Slider для temperature
-    document.getElementById('temperature').addEventListener('input', function() {
-        document.getElementById('temperatureValue').textContent = this.value;
+    // Save button
+    document.getElementById('saveBtn').addEventListener('click', saveSettings);
+    
+    // Reset button
+    document.getElementById('resetBtn').addEventListener('click', resetSettings);
+    
+    // Test connection button
+    document.getElementById('testConnection').addEventListener('click', testConnection);
+    
+    // History buttons
+    document.getElementById('exportHistory').addEventListener('click', exportHistory);
+    document.getElementById('importHistory').addEventListener('click', importHistory);
+    document.getElementById('clearHistory').addEventListener('click', clearHistory);
+    document.getElementById('clearCache').addEventListener('click', clearCache);
+    
+    // Refresh system info
+    document.getElementById('refreshSystemInfo').addEventListener('click', loadSystemInfo);
+    
+    // Modal close button
+    document.getElementById('closeModal').addEventListener('click', closeModal);
+    document.getElementById('cancelBtn').addEventListener('click', closeModal);
+    
+    // Filter history
+    document.getElementById('historySearch').addEventListener('input', filterHistory);
+    document.getElementById('historyFilter').addEventListener('change', filterHistory);
+    document.getElementById('clearHistorySearch').addEventListener('click', function() {
+        document.getElementById('historySearch').value = '';
+        document.getElementById('historyFilter').value = 'all';
+        filterHistory();
     });
     
-    // Slider для maxLength
-    document.getElementById('maxLength').addEventListener('input', function() {
-        document.getElementById('maxLengthValue').textContent = this.value;
+    // Theme switcher
+    document.getElementById('theme').addEventListener('change', function() {
+        setupTheme();
     });
     
-    // Slider для confidenceThreshold
-    document.getElementById('confidenceThreshold').addEventListener('input', function() {
-        document.getElementById('confidenceThresholdValue').textContent = Math.round(this.value * 100) + '%';
+    // Performance mode switcher
+    const perfRadios = document.querySelectorAll('input[name="performanceMode"]');
+    perfRadios.forEach(radio => {
+        radio.addEventListener('change', updatePerformancePreset);
     });
     
-    // Slider для notificationDuration
-    document.getElementById('notificationDuration').addEventListener('input', function() {
-        document.getElementById('notificationDurationValue').textContent = this.value;
-    });
-    
-    // Slider для maxConcurrentTasks
-    document.getElementById('maxConcurrentTasks').addEventListener('input', function() {
-        document.getElementById('maxConcurrentTasksValue').textContent = this.value;
-    });
-    
-    // Slider для cacheSize
-    document.getElementById('cacheSize').addEventListener('input', function() {
-        document.getElementById('cacheSizeValue').textContent = this.value + 'MB';
-    });
-    
-    // Режим производительности
-    document.getElementById('performanceMode').addEventListener('change', updatePerformanceSettings);
+    // Range sliders - update display values
+    setupRangeListeners();
 }
 
-// Обновление настроек производительности
-function updatePerformanceSettings() {
-    const mode = document.getElementById('performanceMode').value;
-    const customSettings = document.getElementById('customPerformanceSettings');
+// Setup range slider listeners
+function setupRangeListeners() {
+    const ranges = [
+        { id: 'temperature', display: 'temperatureValue' },
+        { id: 'maxLength', display: 'maxLengthValue' },
+        { id: 'confidenceThreshold', display: 'confidenceThresholdValue', format: (v) => Math.round(v * 100) + '%' },
+        { id: 'notificationDuration', display: 'notificationDurationValue' },
+        { id: 'maxConcurrentTasks', display: 'maxConcurrentTasksValue' },
+        { id: 'cacheSize', display: 'cacheSizeValue' },
+        { id: 'delayBetweenActions', display: 'delayBetweenActionsValue' }
+    ];
     
-    if (mode === 'custom') {
-        customSettings.style.display = 'block';
-    } else {
-        customSettings.style.display = 'none';
-        
-        // Автоматически настраиваем параметры в зависимости от режима
-        if (mode === 'performance') {
-            document.getElementById('enableOCR').checked = true;
-            document.getElementById('enableComplexAnalysis').checked = true;
-            document.getElementById('enableAutoSolve').checked = true;
-            document.getElementById('enableRealTime').checked = true;
-            document.getElementById('maxConcurrentTasks').value = 5;
-            document.getElementById('maxConcurrentTasksValue').textContent = '5';
-        } else if (mode === 'battery') {
-            document.getElementById('enableOCR').checked = false;
-            document.getElementById('enableComplexAnalysis').checked = false;
-            document.getElementById('enableAutoSolve').checked = false;
-            document.getElementById('enableRealTime').checked = false;
-            document.getElementById('maxConcurrentTasks').value = 1;
-            document.getElementById('maxConcurrentTasksValue').textContent = '1';
-        } else {
-            // Balanced
-            document.getElementById('enableOCR').checked = true;
-            document.getElementById('enableComplexAnalysis').checked = true;
-            document.getElementById('enableAutoSolve').checked = true;
-            document.getElementById('enableRealTime').checked = true;
-            document.getElementById('maxConcurrentTasks').value = 3;
-            document.getElementById('maxConcurrentTasksValue').textContent = '3';
+    ranges.forEach(range => {
+        const el = document.getElementById(range.id);
+        const displayEl = document.getElementById(range.display);
+        if (el && displayEl) {
+            el.addEventListener('input', function() {
+                if (range.format) {
+                    displayEl.textContent = range.format(this.value);
+                } else {
+                    displayEl.textContent = this.value;
+                }
+            });
         }
+    });
+}
+
+// Update performance settings based on selected mode
+function updatePerformancePreset() {
+    const mode = document.querySelector('input[name="performanceMode"]:checked').value;
+    
+    switch(mode) {
+        case 'high':
+            setCheckbox('enableOCR', true);
+            setCheckbox('enableComplexAnalysis', true);
+            setCheckbox('enableAutoSolve', true);
+            setCheckbox('enableRealTime', true);
+            setRange('maxConcurrentTasks', 5, 5);
+            setCheckbox('enableCache', true);
+            setRange('cacheSize', 200, 200);
+            setCheckbox('lazyLoading', false);
+            setCheckbox('minimizeDOM', false);
+            setCheckbox('batchProcessing', true);
+            break;
+            
+        case 'balanced':
+            setCheckbox('enableOCR', true);
+            setCheckbox('enableComplexAnalysis', true);
+            setCheckbox('enableAutoSolve', true);
+            setCheckbox('enableRealTime', true);
+            setRange('maxConcurrentTasks', 3, 3);
+            setCheckbox('enableCache', true);
+            setRange('cacheSize', 100, 100);
+            setCheckbox('lazyLoading', true);
+            setCheckbox('minimizeDOM', true);
+            setCheckbox('batchProcessing', true);
+            break;
+            
+        case 'low':
+            setCheckbox('enableOCR', false);
+            setCheckbox('enableComplexAnalysis', false);
+            setCheckbox('enableAutoSolve', true);
+            setCheckbox('enableRealTime', false);
+            setRange('maxConcurrentTasks', 1, 1);
+            setCheckbox('enableCache', true);
+            setRange('cacheSize', 50, 50);
+            setCheckbox('lazyLoading', true);
+            setCheckbox('minimizeDOM', true);
+            setCheckbox('batchProcessing', false);
+            break;
     }
 }
 
-// Проверка подключения к ИИ
+// Test AI server connection
+function testConnection() {
+    const url = document.getElementById('aiServerUrl').value;
+    const statusBadge = document.getElementById('connectionStatus');
+    
+    statusBadge.textContent = 'Проверка...';
+    statusBadge.className = 'status-badge connecting';
+    
+    fetch(`${url}/api/status`)
+        .then(response => {
+            if (!response.ok) throw new Error('Server error');
+            return response.json();
+        })
+        .then(data => {
+            if (data.ai_loaded && data.browser_connected) {
+                statusBadge.textContent = 'Подключено';
+                statusBadge.className = 'status-badge connected';
+                showToast('✅ Соединение с ИИ установлено!', 'success');
+            } else {
+                statusBadge.textContent = 'Частично подключено';
+                statusBadge.className = 'status-badge warning';
+                showToast('⚠️ ИИ загружен, но браузер не подключен', 'warning');
+            }
+        })
+        .catch(error => {
+            statusBadge.textContent = 'Не подключено';
+            statusBadge.className = 'status-badge disconnected';
+            showToast('❌ Не удалось подключиться к ИИ. Проверьте адрес сервера.', 'error');
+        });
+}
+
+// Check AI connection on load
 function checkAIConnection() {
     chrome.runtime.sendMessage({ action: 'checkAIConnection' }, function(response) {
         const statusBadge = document.getElementById('connectionStatus');
-        
         if (response && response.connected) {
             statusBadge.textContent = 'Подключено';
             statusBadge.className = 'status-badge connected';
@@ -226,229 +372,354 @@ function checkAIConnection() {
     });
 }
 
-// Тестирование соединения
-function testConnection() {
-    const url = document.getElementById('aiServerUrl').value;
-    const statusBadge = document.getElementById('connectionStatus');
-    
-    statusBadge.textContent = 'Проверка...';
-    statusBadge.className = 'status-badge loading';
-    
-    fetch(`${url}/api/status`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.ai_loaded && data.browser_connected) {
-                statusBadge.textContent = 'Подключено';
-                statusBadge.className = 'status-badge connected';
-                showNotification('✅ Соединение с ИИ установлено!', 'success');
-            } else {
-                statusBadge.textContent = 'Частично подключено';
-                statusBadge.className = 'status-badge warning';
-                showNotification('⚠️ ИИ загружен, но браузер не подключен', 'warning');
-            }
-        })
-        .catch(error => {
-            statusBadge.textContent = 'Не подключено';
-            statusBadge.className = 'status-badge disconnected';
-            showNotification('❌ Не удалось подключиться к ИИ. Проверьте адрес сервера.', 'error');
-        });
-}
-
-// Переподключение
-function reconnect() {
-    const url = document.getElementById('aiServerUrl').value;
-    chrome.storage.sync.set({ aiServerUrl: url });
-    testConnection();
-}
-
-// Сохранение настроек
+// Save settings
 function saveSettings() {
-    const settings = {
-        // Общие настройки
-        extensionEnabled: document.getElementById('extensionEnabled').checked,
-        language: document.getElementById('language').value,
-        theme: document.getElementById('theme').value,
-        
-        // ИИ и модели
-        aiServerUrl: document.getElementById('aiServerUrl').value,
-        aiModel: document.getElementById('aiModel').value,
-        temperature: parseFloat(document.getElementById('temperature').value),
-        maxLength: parseInt(document.getElementById('maxLength').value),
-        confidenceThreshold: parseFloat(document.getElementById('confidenceThreshold').value),
-        
-        // Поведение
-        mode: document.querySelector('input[name="mode"]:checked').value,
-        autoFillInputs: document.getElementById('autoFillInputs').checked,
-        autoClickButtons: document.getElementById('autoClickButtons').checked,
-        autoSubmitForms: document.getElementById('autoSubmitForms').checked,
-        autoNavigate: document.getElementById('autoNavigate').checked,
-        showNotifications: document.getElementById('showNotifications').checked,
-        playSounds: document.getElementById('playSounds').checked,
-        notificationDuration: parseInt(document.getElementById('notificationDuration').value),
-        
-        // Контекст
-        defaultSubject: document.getElementById('defaultSubject').value,
-        contextTemplate: document.getElementById('contextTemplate').value,
-        userContext: document.getElementById('userContext').value,
-        priorityMath: document.getElementById('priorityMath').checked,
-        priorityPhysics: document.getElementById('priorityPhysics').checked,
-        priorityBiology: document.getElementById('priorityBiology').checked,
-        priorityChemistry: document.getElementById('priorityChemistry').checked,
-        priorityHistory: document.getElementById('priorityHistory').checked,
-        
-        // Производительность
-        performanceMode: document.getElementById('performanceMode').value,
-        enableOCR: document.getElementById('enableOCR').checked,
-        enableComplexAnalysis: document.getElementById('enableComplexAnalysis').checked,
-        enableAutoSolve: document.getElementById('enableAutoSolve').checked,
-        enableRealTime: document.getElementById('enableRealTime').checked,
-        maxConcurrentTasks: parseInt(document.getElementById('maxConcurrentTasks').value),
-        cacheSize: parseInt(document.getElementById('cacheSize').value)
-    };
+    const settings = collectFormData();
     
     chrome.storage.sync.set(settings, function() {
-        showNotification('✅ Настройки сохранены!', 'success');
+        currentSettings = { ...settings };
+        showToast('✅ Настройки сохранены!', 'success');
         
-        // Отправляем сообщение в background для обновления
-        chrome.runtime.sendMessage({ action: 'settingsUpdated', settings: settings });
+        // Send update to background script
+        chrome.runtime.sendMessage({ 
+            action: 'settingsUpdated', 
+            settings: settings 
+        });
     });
 }
 
-// Сброс настроек
+// Collect all form data
+function collectFormData() {
+    return {
+        // General
+        extensionEnabled: getCheckbox('extensionEnabled'),
+        language: getSelect('language'),
+        theme: getSelect('theme'),
+        popupWidth: parseInt(getInput('popupWidth')) || 300,
+        fontSize: getSelect('fontSize'),
+        
+        // Notifications
+        showNotifications: getCheckbox('showNotifications'),
+        playSounds: getCheckbox('playSounds'),
+        notificationDuration: parseInt(getInput('notificationDuration')) || 3,
+        
+        // AI
+        aiServerUrl: getInput('aiServerUrl'),
+        aiModel: getSelect('aiModel'),
+        temperature: parseFloat(getInput('temperature')) || 0.7,
+        maxLength: parseInt(getInput('maxLength')) || 500,
+        confidenceThreshold: parseFloat(getInput('confidenceThreshold')) || 0.7,
+        enableOCR: getCheckbox('enableOCR'),
+        enableComplexAnalysis: getCheckbox('enableComplexAnalysis'),
+        enableAutoSolve: getCheckbox('enableAutoSolve'),
+        enableRealTime: getCheckbox('enableRealTime'),
+        
+        // Behavior
+        mode: getRadio('mode'),
+        autoFillInputs: getCheckbox('autoFillInputs'),
+        autoClickButtons: getCheckbox('autoClickButtons'),
+        autoSubmitForms: getCheckbox('autoSubmitForms'),
+        autoNavigate: getCheckbox('autoNavigate'),
+        defaultPlatform: getSelect('defaultPlatform'),
+        delayBetweenActions: parseInt(getInput('delayBetweenActions')) || 500,
+        processAllTabs: getCheckbox('processAllTabs'),
+        maxConcurrentTasks: parseInt(getInput('maxConcurrentTasks')) || 3,
+        
+        // Context
+        defaultSubject: getSelect('defaultSubject'),
+        contextTemplate: getTextarea('contextTemplate'),
+        userContext: getTextarea('userContext'),
+        priorityMath: getCheckbox('priorityMath'),
+        priorityPhysics: getCheckbox('priorityPhysics'),
+        priorityBiology: getCheckbox('priorityBiology'),
+        priorityChemistry: getCheckbox('priorityChemistry'),
+        priorityHistory: getCheckbox('priorityHistory'),
+        priorityInformatics: getCheckbox('priorityInformatics'),
+        priorityLanguages: getCheckbox('priorityLanguages'),
+        priorityStatistics: getCheckbox('priorityStatistics'),
+        detectMathProblems: getCheckbox('detectMathProblems'),
+        detectTextProblems: getCheckbox('detectTextProblems'),
+        detectMultipleChoice: getCheckbox('detectMultipleChoice'),
+        detectOpenQuestions: getCheckbox('detectOpenQuestions'),
+        
+        // Performance
+        performanceMode: getRadio('performanceMode'),
+        enableCache: getCheckbox('enableCache'),
+        cacheSize: parseInt(getInput('cacheSize')) || 100,
+        lazyLoading: getCheckbox('lazyLoading'),
+        minimizeDOM: getCheckbox('minimizeDOM'),
+        batchProcessing: getCheckbox('batchProcessing')
+    };
+}
+
+// Helper functions for getting form values
+function getCheckbox(id) {
+    const el = document.getElementById(id);
+    return el ? el.checked : false;
+}
+
+function getSelect(id) {
+    const el = document.getElementById(id);
+    return el ? el.value : '';
+}
+
+function getInput(id) {
+    const el = document.getElementById(id);
+    return el ? el.value : '';
+}
+
+function getTextarea(id) {
+    const el = document.getElementById(id);
+    return el ? el.value : '';
+}
+
+function getRadio(name) {
+    const radio = document.querySelector(`input[name="${name}"]:checked`);
+    return radio ? radio.value : '';
+}
+
+// Reset settings to default
 function resetSettings() {
     if (confirm('Вы уверены, что хотите сбросить все настройки к значениям по умолчанию?')) {
         chrome.storage.sync.set(DEFAULT_SETTINGS, function() {
-            showNotification('✅ Настройки сброшены!', 'success');
-            loadSettings();
+            currentSettings = { ...DEFAULT_SETTINGS };
+            populateForm();
+            showToast('✅ Настройки сброшены!', 'success');
         });
     }
 }
 
-// Сброс контекста
-function resetContext() {
-    if (confirm('Вы уверены, что хотите сбросить настройки контекста?')) {
-        chrome.storage.sync.set({
-            defaultSubject: DEFAULT_SETTINGS.defaultSubject,
-            contextTemplate: DEFAULT_SETTINGS.contextTemplate,
-            userContext: DEFAULT_SETTINGS.userContext
-        }, function() {
-            showNotification('✅ Контекст сброшен!', 'success');
-            loadSettings();
-        });
-    }
+// Setup theme
+function setupTheme() {
+    const theme = document.getElementById('theme').value || currentSettings.theme;
+    document.body.setAttribute('data-theme', theme);
 }
 
-// Очистка всех данных
-function clearAllData() {
-    if (confirm('ВНИМАНИЕ! Это удалит ВСЕ настройки и историю. Вы уверены?')) {
-        chrome.storage.sync.clear(function() {
-            showNotification('✅ Все данные очищены!', 'success');
-            loadSettings();
-        });
+// Load system information
+function loadSystemInfo() {
+    // Extension version
+    const manifest = chrome.runtime.getManifest();
+    document.getElementById('extVersion').textContent = manifest.version || '1.0.0';
+    
+    // Browser info
+    const userAgent = navigator.userAgent;
+    let browserInfo = 'Unknown';
+    if (userAgent.includes('Chrome')) browserInfo = 'Chrome';
+    else if (userAgent.includes('Firefox')) browserInfo = 'Firefox';
+    else if (userAgent.includes('Edge')) browserInfo = 'Edge';
+    else if (userAgent.includes('Safari')) browserInfo = 'Safari';
+    document.getElementById('browserInfo').textContent = browserInfo;
+    
+    // Memory info (approximate)
+    if (navigator.deviceMemory) {
+        document.getElementById('memoryInfo').textContent = navigator.deviceMemory + 'GB';
+    } else {
+        document.getElementById('memoryInfo').textContent = 'Unknown';
     }
+    
+    // CPU info (approximate)
+    if (navigator.hardwareConcurrency) {
+        document.getElementById('cpuInfo').textContent = navigator.hardwareConcurrency + ' cores';
+    } else {
+        document.getElementById('cpuInfo').textContent = 'Unknown';
+    }
+    
+    // Active tabs
+    chrome.tabs.query({}, function(tabs) {
+        document.getElementById('tabsCount').textContent = tabs.length;
+    });
+    
+    // Storage usage
+    chrome.storage.sync.getBytesInUse(function(bytes) {
+        const mb = (bytes / (1024 * 1024)).toFixed(2);
+        document.getElementById('storageUsage').textContent = mb + 'MB';
+    });
 }
 
-// Загрузка истории
+// Toast notifications
+function showToast(message, type = 'info') {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `<span>${message}</span>`;
+    container.appendChild(toast);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        toast.classList.add('hiding');
+        setTimeout(() => toast.remove(), 250);
+    }, 3000);
+}
+
+// Modal functions
+function showModal(title, body, onConfirm) {
+    const modal = document.getElementById('confirmModal');
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalBody').textContent = body;
+    
+    // Remove existing event listener
+    document.getElementById('confirmBtn').onclick = null;
+    
+    // Add new event listener
+    document.getElementById('confirmBtn').addEventListener('click', function() {
+        if (onConfirm) onConfirm();
+        closeModal();
+    });
+    
+    modal.classList.add('active');
+}
+
+function closeModal() {
+    document.getElementById('confirmModal').classList.remove('active');
+}
+
+// History functions
 function loadHistory() {
     chrome.storage.local.get(['history'], function(data) {
-        const historyList = document.getElementById('historyList');
         const history = data.history || [];
-        
-        if (history.length === 0) {
-            historyList.innerHTML = '<div class="alert alert-info">История пуста</div>';
-            return;
-        }
-        
-        historyList.innerHTML = history.slice(0, 50).map(item => `
-            <div class="history-item">
-                <div>
-                    <div class="question">${escapeHtml(item.question.substring(0, 100))}${item.question.length > 100 ? '...' : ''}</div>
-                    <div class="answer">${escapeHtml(item.answer)}</div>
-                </div>
-                <div>
-                    <div class="timestamp">${formatDate(item.timestamp)}</div>
-                    <div class="actions">
-                        <button class="btn btn-sm btn-primary btn-icon" onclick="copyToClipboard('${escapeHtml(item.answer)}')">📋</button>
-                        <button class="btn btn-sm btn-danger btn-icon" onclick="removeHistoryItem(${history.indexOf(item)})">🗑️</button>
-                    </div>
-                </div>
-            </div>
-        `).join('');
-        
-        // Обновляем статистику
+        renderHistory(history);
         updateStats(history);
     });
 }
 
-// Фильтрация истории
-function filterHistory() {
-    const filter = document.getElementById('historyFilter').value;
+function renderHistory(history) {
+    const tbody = document.getElementById('historyBody');
+    
+    if (history.length === 0) {
+        tbody.innerHTML = '<tr class="empty-state"><td colspan="6">Нет данных истории</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = history.slice(0, 100).map((item, index) => {
+        const date = new Date(item.timestamp);
+        const formattedDate = date.toLocaleString('ru-RU');
+        const platform = item.platform || 'Unknown';
+        const subject = item.subject || 'Unknown';
+        const type = item.type || 'Unknown';
+        const status = item.success ? '✅ Успех' : '❌ Ошибка';
+        
+        return `
+            <tr>
+                <td>${formattedDate}</td>
+                <td>${platform}</td>
+                <td>${subject}</td>
+                <td>${type}</td>
+                <td><span class="status-badge ${item.success ? 'connected' : 'disconnected'}">${item.success ? '✅' : '❌'}</span></td>
+                <td>
+                    <button class="btn btn-sm btn-info" onclick="viewHistoryItem(${index})" title="Просмотр">👁️</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteHistoryItem(${index})" title="Удалить">🗑️</button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function viewHistoryItem(index) {
     chrome.storage.local.get(['history'], function(data) {
         const history = data.history || [];
-        const historyList = document.getElementById('historyList');
+        const item = history[index];
         
-        let filtered = history;
-        
-        if (filter === 'today') {
-            const today = new Date().toISOString().split('T')[0];
-            filtered = history.filter(item => item.timestamp.startsWith(today));
-        } else if (filter === 'week') {
-            const weekAgo = new Date();
-            weekAgo.setDate(weekAgo.getDate() - 7);
-            filtered = history.filter(item => new Date(item.timestamp) >= weekAgo);
-        } else if (filter !== 'all') {
-            filtered = history.filter(item => item.subject === filter);
-        }
-        
-        if (filtered.length === 0) {
-            historyList.innerHTML = '<div class="alert alert-info">Нет записей</div>';
-            return;
-        }
-        
-        historyList.innerHTML = filtered.slice(0, 50).map(item => `
-            <div class="history-item">
-                <div>
-                    <div class="question">${escapeHtml(item.question.substring(0, 100))}${item.question.length > 100 ? '...' : ''}</div>
-                    <div class="answer">${escapeHtml(item.answer)}</div>
+        if (item) {
+            const modalBody = document.getElementById('modalBody');
+            modalBody.innerHTML = `
+                <div class="modal-content">
+                    <p><strong>Вопрос:</strong> ${escapeHtml(item.question)}</p>
+                    <p><strong>Ответ:</strong> ${escapeHtml(item.answer)}</p>
+                    <p><strong>Платформа:</strong> ${item.platform || 'Unknown'}</p>
+                    <p><strong>Предмет:</strong> ${item.subject || 'Unknown'}</p>
+                    <p><strong>Время:</strong> ${new Date(item.timestamp).toLocaleString('ru-RU')}</p>
                 </div>
-                <div>
-                    <div class="timestamp">${formatDate(item.timestamp)}</div>
-                    <div class="actions">
-                        <button class="btn btn-sm btn-primary btn-icon" onclick="copyToClipboard('${escapeHtml(item.answer)}')">📋</button>
-                        <button class="btn btn-sm btn-danger btn-icon" onclick="removeHistoryItem(${history.indexOf(item)})">🗑️</button>
-                    </div>
-                </div>
-            </div>
-        `).join('');
-        
-        updateStats(filtered);
+            `;
+            document.getElementById('modalTitle').textContent = 'Подробности решения';
+            document.getElementById('confirmBtn').style.display = 'none';
+            document.getElementById('confirmModal').classList.add('active');
+        }
     });
 }
 
-// Удаление элемента истории
-function removeHistoryItem(index) {
-    chrome.storage.local.get(['history'], function(data) {
-        const history = data.history || [];
-        history.splice(index, 1);
-        
-        chrome.storage.local.set({ history: history }, function() {
-            showNotification('🗑️ Запись удалена!', 'success');
-            loadHistory();
-        });
-    });
-}
-
-// Очистка истории
-function clearHistory() {
-    if (confirm('Вы уверены, что хотите очистить всю историю?')) {
-        chrome.storage.local.set({ history: [] }, function() {
-            showNotification('✅ История очищена!', 'success');
-            loadHistory();
+function deleteHistoryItem(index) {
+    if (confirm('Удалить этот элемент из истории?')) {
+        chrome.storage.local.get(['history'], function(data) {
+            const history = data.history || [];
+            history.splice(index, 1);
+            
+            chrome.storage.local.set({ history: history }, function() {
+                showToast('🗑️ Запись удалена!', 'success');
+                loadHistory();
+            });
         });
     }
 }
 
-// Экспорт истории
+function filterHistory() {
+    const search = document.getElementById('historySearch').value.toLowerCase();
+    const filter = document.getElementById('historyFilter').value;
+    
+    chrome.storage.local.get(['history'], function(data) {
+        let history = data.history || [];
+        
+        // Apply filter
+        if (filter === 'success') {
+            history = history.filter(item => item.success);
+        } else if (filter === 'failed') {
+            history = history.filter(item => !item.success);
+        } else if (filter === 'manual') {
+            history = history.filter(item => item.mode === 'manual');
+        }
+        
+        // Apply search
+        if (search) {
+            history = history.filter(item => 
+                (item.question && item.question.toLowerCase().includes(search)) ||
+                (item.answer && item.answer.toLowerCase().includes(search)) ||
+                (item.platform && item.platform.toLowerCase().includes(search)) ||
+                (item.subject && item.subject.toLowerCase().includes(search))
+            );
+        }
+        
+        renderHistory(history);
+        updateStats(history);
+    });
+}
+
+function updateStats(history) {
+    const total = history.length;
+    const success = history.filter(item => item.success).length;
+    const successRate = total > 0 ? Math.round((success / total) * 100) : 0;
+    
+    // Calculate average time (if available)
+    const times = history.filter(item => item.time).map(item => item.time);
+    const avgTime = times.length > 0 ? Math.round(times.reduce((a, b) => a + b, 0) / times.length) : 0;
+    
+    // Get favorite subject
+    const subjects = {};
+    history.forEach(item => {
+        const subject = item.subject || 'Unknown';
+        subjects[subject] = (subjects[subject] || 0) + 1;
+    });
+    const favoriteSubject = Object.keys(subjects).length > 0 
+        ? Object.entries(subjects).sort((a, b) => b[1] - a[1])[0][0]
+        : '-';
+    
+    document.getElementById('totalSolved').textContent = total;
+    document.getElementById('successRate').textContent = successRate + '%';
+    document.getElementById('avgTime').textContent = avgTime + 'с';
+    document.getElementById('favoriteSubject').textContent = favoriteSubject;
+}
+
+function clearHistory() {
+    showModal(
+        'Очистить историю',
+        'Вы уверены, что хотите удалить всю историю решений?',
+        function() {
+            chrome.storage.local.set({ history: [] }, function() {
+                showToast('🗑️ История очищена!', 'success');
+                loadHistory();
+            });
+        }
+    );
+}
+
 function exportHistory() {
     chrome.storage.local.get(['history'], function(data) {
         const history = data.history || [];
@@ -463,19 +734,19 @@ function exportHistory() {
         link.click();
         document.body.removeChild(link);
         
-        showNotification('📥 История экспортирована!', 'success');
+        showToast('📥 История экспортирована!', 'success');
     });
 }
 
-// Импорт истории
 function importHistory() {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
     input.onchange = function(e) {
         const file = e.target.files[0];
-        const reader = new FileReader();
+        if (!file) return;
         
+        const reader = new FileReader();
         reader.onload = function(e) {
             try {
                 const history = JSON.parse(e.target.result);
@@ -484,242 +755,55 @@ function importHistory() {
                     const newHistory = [...existingHistory, ...history];
                     
                     chrome.storage.local.set({ history: newHistory }, function() {
-                        showNotification('📤 История импортирована!', 'success');
+                        showToast('📤 История импортирована!', 'success');
                         loadHistory();
                     });
                 });
             } catch (error) {
-                showNotification('❌ Ошибка импорта!', 'error');
+                showToast('❌ Ошибка импорта!', 'error');
             }
         };
-        
         reader.readAsText(file);
     };
-    
     input.click();
 }
 
-// Обновление статистики
-function updateStats(history) {
-    const stats = {
-        total: history.length,
-        successful: history.filter(item => item.success).length,
-        averageRating: history.reduce((sum, item) => sum + (item.rating || 0), 0) / history.length || 0,
-        errors: history.filter(item => item.error).length
-    };
-    
-    const statElements = document.querySelectorAll('.stat-item');
-    if (statElements.length >= 4) {
-        statElements[0].innerHTML = `<div style="font-size: 24px; font-weight: bold; color: var(--primary);">${stats.total}</div><div style="font-size: 12px; color: var(--text-secondary);">Всего запросов</div>`;
-        statElements[1].innerHTML = `<div style="font-size: 24px; font-weight: bold; color: var(--success);">${stats.successful}</div><div style="font-size: 12px; color: var(--text-secondary);">Успешных ответов</div>`;
-        statElements[2].innerHTML = `<div style="font-size: 24px; font-weight: bold; color: var(--warning);">${stats.averageRating.toFixed(1)}</div><div style="font-size: 12px; color: var(--text-secondary);">Средний рейтинг</div>`;
-        statElements[3].innerHTML = `<div style="font-size: 24px; font-weight: bold; color: var(--danger);">${stats.errors}</div><div style="font-size: 12px; color: var(--text-secondary);">Ошибок</div>`;
-    }
-}
-
-// Загрузка информации о системе
-function loadSystemInfo() {
-    // Получаем информацию о браузере
-    const userAgent = navigator.userAgent;
-    let browser = 'Неизвестный';
-    let os = 'Неизвестная';
-    
-    if (userAgent.includes('Firefox')) {
-        browser = 'Mozilla Firefox';
-    } else if (userAgent.includes('Edg')) {
-        browser = 'Microsoft Edge';
-    } else if (userAgent.includes('OPR')) {
-        browser = 'Opera';
-    } else if (userAgent.includes('Chrome')) {
-        browser = 'Google Chrome';
-    } else if (userAgent.includes('Safari')) {
-        browser = 'Apple Safari';
-    }
-    
-    if (userAgent.includes('Windows')) {
-        os = 'Windows';
-    } else if (userAgent.includes('Mac')) {
-        os = 'macOS';
-    } else if (userAgent.includes('Linux')) {
-        os = 'Linux';
-    } else if (userAgent.includes('Android')) {
-        os = 'Android';
-    } else if (userAgent.includes('iPhone') || userAgent.includes('iPad')) {
-        os = 'iOS';
-    }
-    
-    document.getElementById('browserInfo').textContent = browser;
-    document.getElementById('osInfo').textContent = os;
-    
-    // Получаем информацию о памяти (если возможно)
-    if (navigator.deviceMemory) {
-        document.getElementById('memoryInfo').textContent = `${navigator.deviceMemory} GB`;
-    } else {
-        document.getElementById('memoryInfo').textContent = 'Неизвестно';
-    }
-    
-    // Получаем информацию о процессоре
-    if (navigator.hardwareConcurrency) {
-        document.getElementById('cpuInfo').textContent = `${navigator.hardwareConcurrency} ядер`;
-    } else {
-        document.getElementById('cpuInfo').textContent = 'Неизвестно';
-    }
-    
-    // Загружаем рекомендации
-    loadRecommendations(browser, os, navigator.deviceMemory, navigator.hardwareConcurrency);
-}
-
-// Загрузка рекомендаций
-function loadRecommendations(browser, os, memory, cpuCores) {
-    const recommendations = [];
-    
-    // Рекомендации по ОЗУ
-    if (memory && memory < 4) {
-        recommendations.push('⚠️ У вас мало оперативной памяти. Рекомендуется использовать модель TinyLlama-1.1B.');
-    } else if (memory && memory >= 8) {
-        recommendations.push('✅ У вас достаточно оперативной памяти. Можно использовать любую модель.');
-    }
-    
-    // Рекомендации по процессору
-    if (cpuCores && cpuCores < 4) {
-        recommendations.push('⚠️ У вас мало ядер процессора. Отключите тяжелые функции для улучшения производительности.');
-    }
-    
-    // Рекомендации по браузеру
-    if (browser !== 'Google Chrome' && browser !== 'Microsoft Edge') {
-        recommendations.push('ℹ️ Для наилучшей работы рекомендуется использовать Google Chrome или Microsoft Edge.');
-    }
-    
-    // Если нет рекомендаций
-    if (recommendations.length === 0) {
-        recommendations.push('✅ Ваша система полностью совместима с Mr. 7B!');
-    }
-    
-    document.getElementById('recommendations').innerHTML = recommendations.map(r => `<div style="margin-bottom: 8px;">${r}</div>`).join('');
-}
-
-// Запуск диагностики
-function runDiagnostics() {
-    showNotification('🔍 Запуск диагностики...', 'info');
-    
-    // Проверяем подключение к ИИ
-    testConnection();
-    
-    // Проверяем настройки
-    chrome.storage.sync.get(null, function(data) {
-        if (Object.keys(data).length === 0) {
-            showNotification('⚠️ Настройки не сохранены. Используются значения по умолчанию.', 'warning');
-        } else {
-            showNotification('✅ Настройки загружены успешно.', 'success');
+function clearCache() {
+    showModal(
+        'Очистить кэш',
+        'Вы уверены, что хотите очистить кэш?',
+        function() {
+            chrome.storage.local.set({ cache: {} }, function() {
+                showToast('🧹 Кэш очищен!', 'success');
+            });
         }
-    });
-    
-    // Проверяем историю
-    chrome.storage.local.get(['history'], function(data) {
-        if (!data.history || data.history.length === 0) {
-            showNotification('ℹ️ История пуста.', 'info');
-        } else {
-            showNotification(`✅ История содержит ${data.history.length} записей.`, 'success');
-        }
-    });
+    );
 }
 
-// Копирование в буфер обмена
-function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(() => {
-        showNotification('📋 Скопировано в буфер обмена!', 'success');
-    }).catch(() => {
-        showNotification('❌ Не удалось скопировать!', 'error');
-    });
-}
-
-// Форматирование даты
-function formatDate(timestamp) {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diff = now - date;
-    
-    // Если меньше минуты
-    if (diff < 60000) {
-        return 'Только что';
-    }
-    
-    // Если меньше часа
-    if (diff < 3600000) {
-        return `${Math.floor(diff / 60000)} мин назад`;
-    }
-    
-    // Если меньше дня
-    if (diff < 86400000) {
-        return `${Math.floor(diff / 3600000)} ч назад`;
-    }
-    
-    // Если меньше недели
-    if (diff < 604800000) {
-        return `${Math.floor(diff / 86400000)} дн назад`;
-    }
-    
-    // Форматируем дату
-    return date.toLocaleDateString('ru-RU', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
-}
-
-// Экранирование HTML
+// Utility functions
 function escapeHtml(text) {
+    if (!text) return '';
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
 }
 
-// Отображение уведомлений
-function showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.textContent = message;
-    notification.style.position = 'fixed';
-    notification.style.top = '20px';
-    notification.style.right = '20px';
-    notification.style.padding = '15px 25px';
-    notification.style.borderRadius = '8px';
-    notification.style.zIndex = '999999';
-    notification.style.animation = 'fadeIn 0.3s, fadeOut 0.3s 3s';
-    
-    if (type === 'success') {
-        notification.style.background = 'linear-gradient(135deg, #10b981, #059669)';
-    } else if (type === 'error') {
-        notification.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
-    } else if (type === 'warning') {
-        notification.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
-    } else {
-        notification.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
-    }
-    
-    notification.style.color = 'white';
-    notification.style.fontSize = '14px';
-    notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.remove();
-    }, 3500);
+function formatDate(timestamp) {
+    if (!timestamp) return '';
+    const date = new Date(timestamp);
+    return date.toLocaleString('ru-RU');
 }
 
-// Добавляем CSS для уведомлений
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateX(20px); }
-        to { opacity: 1; transform: translateX(0); }
-    }
-    @keyframes fadeOut {
-        from { opacity: 1; transform: translateX(0); }
-        to { opacity: 0; transform: translateX(20px); }
-    }
-`;
-document.head.appendChild(style);
+// Make functions available globally for onclick handlers
+window.showModal = showModal;
+window.closeModal = closeModal;
+window.viewHistoryItem = viewHistoryItem;
+window.deleteHistoryItem = deleteHistoryItem;
+window.filterHistory = filterHistory;
+window.exportHistory = exportHistory;
+window.importHistory = importHistory;
+window.clearHistory = clearHistory;
+window.clearCache = clearCache;
+window.saveSettings = saveSettings;
+window.resetSettings = resetSettings;
+window.testConnection = testConnection;

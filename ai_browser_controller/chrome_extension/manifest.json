@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Mr. 7B - ИИ Умный Браузер",
-  "version": "1.0.0",
-  "description": "ИИ-ассистент с локальной моделью для полного управления браузером. Решает задачи, заполняет формы, анализирует страницы.",
+  "name": "Mr. 7B - AI Browser Controller",
+  "version": "1.1.0",
+  "description": "AI-powered browser automation with local LLM support. Solves academic problems, auto-fills forms, and manages browser tabs intelligently.",
   
   "permissions": [
     "activeTab",
@@ -15,7 +15,8 @@
     "debugger",
     "notifications",
     "clipboardWrite",
-    "clipboardRead"
+    "clipboardRead",
+    "alarms"
   ],
   
   "host_permissions": [
@@ -38,7 +39,7 @@
   
   "options_ui": {
     "page": "options.html",
-    "open_in_tab": false
+    "open_in_tab": true
   },
   
   "icons": {
@@ -60,15 +61,21 @@
   "commands": {
     "toggle_extension": {
       "suggested_keyboard_shortcuts": ["Ctrl+Shift+7"],
-      "description": "Включить/отключить Mr. 7B"
+      "description": "Toggle Mr. 7B on/off"
     },
     "auto_solve": {
       "suggested_keyboard_shortcuts": ["Ctrl+Shift+8"],
-      "description": "Автоматически решить все задачи на странице"
+      "description": "Auto-solve all tasks on current page"
     },
     "ai_analyze": {
       "suggested_keyboard_shortcuts": ["Ctrl+Shift+9"],
-      "description": "Проанализировать страницу с помощью ИИ"
+      "description": "Analyze page with AI assistance"
+    },
+    "open_settings": {
+      "suggested_keyboard_shortcuts": ["Ctrl+Shift+0"],
+      "description": "Open Mr. 7B settings"
     }
-  }
+  },
+  
+  "minimum_chrome_version": "90"
 }

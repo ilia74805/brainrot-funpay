@@ -2,11 +2,633 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mr. 7B - Настройки</title>
+    <link rel="stylesheet" href="options.css">
 </head>
 <body>
-    <h1>Настройки Mr. 7B загружаются...</h1>
-    <p>Пожалуйста, подождите...</p>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <svg class="logo-icon" viewBox="0 0 128 128">
+                    <defs>
+                        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <rect width="128" height="128" rx="24" fill="url(#grad)"/>
+                    <text x="64" y="75" font-family="Arial, sans-serif" font-size="60" fill="white" text-anchor="middle" font-weight="bold">7</text>
+                    <text x="64" y="95" font-family="Arial, sans-serif" font-size="20" fill="white" text-anchor="middle">B</text>
+                </svg>
+                <div class="logo-text">
+                    <h1>Mr. 7B</h1>
+                    <span class="subtitle">AI Browser Controller</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button id="saveBtn" class="btn btn-primary">
+                    <span class="icon">💾</span> Сохранить
+                </button>
+                <button id="resetBtn" class="btn btn-secondary">
+                    <span class="icon">🔄</span> Сброс
+                </button>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <button class="tab-btn active" data-tab="general">
+                <span class="tab-icon">⚙️</span> Общие
+            </button>
+            <button class="tab-btn" data-tab="ai">
+                <span class="tab-icon">🤖</span> ИИ
+            </button>
+            <button class="tab-btn" data-tab="behavior">
+                <span class="tab-icon">🎯</span> Поведение
+            </button>
+            <button class="tab-btn" data-tab="context">
+                <span class="tab-icon">📝</span> Контекст
+            </button>
+            <button class="tab-btn" data-tab="history">
+                <span class="tab-icon">📊</span> История
+            </button>
+            <button class="tab-btn" data-tab="performance">
+                <span class="tab-icon">⚡</span> Производительность
+            </button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- General Tab -->
+            <section id="general" class="tab-content active">
+                <div class="settings-grid">
+                    <div class="settings-group">
+                        <h3>📱 Основные настройки</h3>
+                        <div class="form-row">
+                            <label class="switch">
+                                <input type="checkbox" id="extensionEnabled">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="label-text">Включить расширение</span>
+                        </div>
+                        
+                        <div class="form-row">
+                            <label for="language">Язык интерфейса:</label>
+                            <select id="language" class="form-select">
+                                <option value="ru">Русский</option>
+                                <option value="en">English</option>
+                                <option value="auto">Авто</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-row">
+                            <label for="theme">Тема оформления:</label>
+                            <select id="theme" class="form-select">
+                                <option value="system">Системная</option>
+                                <option value="light">Светлая</option>
+                                <option value="dark">Тёмная</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>🔊 Уведомления</h3>
+                        <div class="form-row">
+                            <label class="switch">
+                                <input type="checkbox" id="showNotifications">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="label-text">Показывать уведомления</span>
+                        </div>
+                        <div class="form-row">
+                            <label class="switch">
+                                <input type="checkbox" id="playSounds">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="label-text">Воспроизводить звуки</span>
+                        </div>
+                        <div class="form-row">
+                            <label for="notificationDuration">Длительность уведомлений (сек):</label>
+                            <div class="range-container">
+                                <input type="range" id="notificationDuration" min="1" max="10" step="1">
+                                <span id="notificationDurationValue" class="range-value">3</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>🎨 Внешний вид</h3>
+                        <div class="form-row">
+                            <label for="popupWidth">Ширина всплывающего окна:</label>
+                            <input type="number" id="popupWidth" class="form-input" min="200" max="800" step="10">
+                        </div>
+                        <div class="form-row">
+                            <label for="fontSize">Размер шрифта:</label>
+                            <select id="fontSize" class="form-select">
+                                <option value="small">Маленький</option>
+                                <option value="medium" selected>Средний</option>
+                                <option value="large">Большой</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI Tab -->
+            <section id="ai" class="tab-content">
+                <div class="settings-grid">
+                    <div class="settings-group">
+                        <h3>🤖 Настройки ИИ</h3>
+                        <div class="form-row">
+                            <label for="aiServerUrl">URL сервера ИИ:</label>
+                            <input type="text" id="aiServerUrl" class="form-input" placeholder="http://localhost:3000">
+                        </div>
+                        <div class="form-row">
+                            <label for="aiModel">Модель ИИ:</label>
+                            <select id="aiModel" class="form-select">
+                                <option value="phi-2">Phi-2 (быстрая)</option>
+                                <option value="phi-2:4k">Phi-2 4K (точная)</option>
+                                <option value="mistral-7b">Mistral 7B (мощная)</option>
+                                <option value="llama-2-7b">Llama 2 7B</option>
+                                <option value="custom">Пользовательская</option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <button id="testConnection" class="btn btn-info">
+                                <span class="icon">🔗</span> Проверить соединение
+                            </button>
+                            <span id="connectionStatus" class="status-badge"></span>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>🎛️ Параметры генерации</h3>
+                        <div class="form-row">
+                            <label for="temperature">Температура:</label>
+                            <div class="range-container">
+                                <input type="range" id="temperature" min="0" max="1" step="0.1">
+                                <span id="temperatureValue" class="range-value">0.7</span>
+                            </div>
+                            <div class="hint">Низкое = более детерминированно, Высокое = более креативно</div>
+                        </div>
+                        <div class="form-row">
+                            <label for="maxLength">Макс. длина ответа:</label>
+                            <div class="range-container">
+                                <input type="range" id="maxLength" min="50" max="2000" step="50">
+                                <span id="maxLengthValue" class="range-value">500</span>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <label for="confidenceThreshold">Порог уверенности (%):</label>
+                            <div class="range-container">
+                                <input type="range" id="confidenceThreshold" min="0" max="1" step="0.05">
+                                <span id="confidenceThresholdValue" class="range-value">70%</span>
+                            </div>
+                            <div class="hint">Минимальный уровень уверенности для автоматического ответа</div>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>🔧 Дополнительные функции</h3>
+                        <div class="form-row">
+                            <label class="switch">
+                                <input type="checkbox" id="enableOCR">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="label-text">Распознавание текста с изображений (OCR)</span>
+                        </div>
+                        <div class="form-row">
+                            <label class="switch">
+                                <input type="checkbox" id="enableComplexAnalysis">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="label-text">Глубокий анализ страниц</span>
+                        </div>
+                        <div class="form-row">
+                            <label class="switch">
+                                <input type="checkbox" id="enableRealTime">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="label-text">Режим реального времени</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Behavior Tab -->
+            <section id="behavior" class="tab-content">
+                <div class="settings-grid">
+                    <div class="settings-group">
+                        <h3>🎯 Режим работы</h3>
+                        <div class="radio-group">
+                            <label class="radio">
+                                <input type="radio" name="mode" value="auto">
+                                <span class="radio-custom"></span>
+                                <span>Автоматический (решает все задачи)</span>
+                            </label>
+                            <label class="radio">
+                                <input type="radio" name="mode" value="manual">
+                                <span class="radio-custom"></span>
+                                <span>Ручной (только по запросу)</span>
+                            </label>
+                            <label class="radio">
+                                <input type="radio" name="mode" value="semi-auto">
+                                <span class="radio-custom"></span>
+                                <span>Полуавтоматический (предлагает ответы)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>🚀 Автоматические действия</h3>
+                        <div class="form-row">
+                            <label class="switch">
+                                <input type="checkbox" id="autoFillInputs">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="label-text">Автозаполнение полей ввода</span>
+                        </div>
+                        <div class="form-row">
+                            <label class="switch">
+                                <input type="checkbox" id="autoClickButtons">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="label-text">Автоматический клик по кнопкам</span>
+                        </div>
+                        <div class="form-row">
+                            <label class="switch">
+                                <input type="checkbox" id="autoSubmitForms">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="label-text">Автоматическая отправка форм</span>
+                        </div>
+                        <div class="form-row">
+                            <label class="switch">
+                                <input type="checkbox" id="autoNavigate">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="label-text">Автоматическая навигация по страницам</span>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>🎭 Настройки платформы</h3>
+                        <div class="form-row">
+                            <label for="defaultPlatform">Платформа по умолчанию:</label>
+                            <select id="defaultPlatform" class="form-select">
+                                <option value="auto">Автоопределение</option>
+                                <option value="foxford">Foxford</option>
+                                <option value="yandex-tutor">Yandex.Tutor</option>
+                                <option value="stepik">Stepik</option>
+                                <option value="custom">Другая</option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <label for="delayBetweenActions">Задержка между действиями (мс):</label>
+                            <input type="number" id="delayBetweenActions" class="form-input" min="0" max="5000" step="100">
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>📱 Многовкладочный режим</h3>
+                        <div class="form-row">
+                            <label for="maxConcurrentTasks">Макс. одновременных задач:</label>
+                            <div class="range-container">
+                                <input type="range" id="maxConcurrentTasks" min="1" max="10" step="1">
+                                <span id="maxConcurrentTasksValue" class="range-value">3</span>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <label class="switch">
+                                <input type="checkbox" id="processAllTabs">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="label-text">Обрабатывать все вкладки автоматически</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Context Tab -->
+            <section id="context" class="tab-content">
+                <div class="settings-grid">
+                    <div class="settings-group full-width">
+                        <h3>📚 Предметные приоритеты</h3>
+                        <div class="checkbox-grid">
+                            <label class="checkbox">
+                                <input type="checkbox" id="priorityMath">
+                                <span class="checkmark"></span>
+                                <span>🔢 Математика</span>
+                            </label>
+                            <label class="checkbox">
+                                <input type="checkbox" id="priorityPhysics">
+                                <span class="checkmark"></span>
+                                <span>⚡ Физика</span>
+                            </label>
+                            <label class="checkbox">
+                                <input type="checkbox" id="priorityBiology">
+                                <span class="checkmark"></span>
+                                <span>🌱 Биология</span>
+                            </label>
+                            <label class="checkbox">
+                                <input type="checkbox" id="priorityChemistry">
+                                <span class="checkmark"></span>
+                                <span>🧪 Химия</span>
+                            </label>
+                            <label class="checkbox">
+                                <input type="checkbox" id="priorityHistory">
+                                <span class="checkmark"></span>
+                                <span>📜 История</span>
+                            </label>
+                            <label class="checkbox">
+                                <input type="checkbox" id="priorityInformatics">
+                                <span class="checkmark"></span>
+                                <span>💻 Информатика</span>
+                            </label>
+                            <label class="checkbox">
+                                <input type="checkbox" id="priorityLanguages">
+                                <span class="checkmark"></span>
+                                <span>🌍 Языки</span>
+                            </label>
+                            <label class="checkbox">
+                                <input type="checkbox" id="priorityStatistics">
+                                <span class="checkmark"></span>
+                                <span>📊 Статистика</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-group full-width">
+                        <h3>📝 Шаблон контекста</h3>
+                        <div class="form-row">
+                            <label for="defaultSubject">Предмет по умолчанию:</label>
+                            <select id="defaultSubject" class="form-select">
+                                <option value="auto">Автоопределение</option>
+                                <option value="math">Математика</option>
+                                <option value="physics">Физика</option>
+                                <option value="biology">Биология</option>
+                                <option value="chemistry">Химия</option>
+                                <option value="history">История</option>
+                                <option value="informatics">Информатика</option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <label for="contextTemplate">Шаблон контекста:</label>
+                            <textarea id="contextTemplate" class="form-textarea" rows="4" placeholder="Вы - опытный учитель. Отвечайте подробно и с пояснениями. Используйте русский язык."></textarea>
+                        </div>
+                        <div class="form-row">
+                            <label for="userContext">Дополнительный контекст:</label>
+                            <textarea id="userContext" class="form-textarea" rows="3" placeholder="Добавьте специфические инструкции или контекст..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="settings-group full-width">
+                        <h3>🔍 Настройки распознавания</h3>
+                        <div class="form-row">
+                            <label class="switch">
+                                <input type="checkbox" id="detectMathProblems">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="label-text">Распознавать математические задачи</span>
+                        </div>
+                        <div class="form-row">
+                            <label class="switch">
+                                <input type="checkbox" id="detectTextProblems">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="label-text">Распознавать текстовые задачи</span>
+                        </div>
+                        <div class="form-row">
+                            <label class="switch">
+                                <input type="checkbox" id="detectMultipleChoice">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="label-text">Распознавать тесты с выбором ответа</span>
+                        </div>
+                        <div class="form-row">
+                            <label class="switch">
+                                <input type="checkbox" id="detectOpenQuestions">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="label-text">Распознавать открытые вопросы</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- History Tab -->
+            <section id="history" class="tab-content">
+                <div class="settings-grid">
+                    <div class="settings-group full-width">
+                        <h3>📊 История решений</h3>
+                        <div class="history-controls">
+                            <div class="filter-group">
+                                <input type="text" id="historySearch" class="form-input" placeholder="Поиск по истории...">
+                                <select id="historyFilter" class="form-select">
+                                    <option value="all">Все</option>
+                                    <option value="success">Успешные</option>
+                                    <option value="failed">Неудачные</option>
+                                    <option value="manual">Ручные</option>
+                                </select>
+                                <button id="clearHistorySearch" class="btn btn-secondary">Очистить</button>
+                            </div>
+                            <div class="history-actions">
+                                <button id="exportHistory" class="btn btn-info">
+                                    <span class="icon">📥</span> Экспорт
+                                </button>
+                                <button id="importHistory" class="btn btn-info">
+                                    <span class="icon">📤</span> Импорт
+                                </button>
+                                <button id="clearHistory" class="btn btn-danger">
+                                    <span class="icon">🗑️</span> Очистить
+                                </button>
+                            </div>
+                        </div>
+                        <div id="historyTableContainer" class="table-container">
+                            <table id="historyTable" class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Дата/Время</th>
+                                        <th>Платформа</th>
+                                        <th>Предмет</th>
+                                        <th>Тип</th>
+                                        <th>Статус</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="historyBody">
+                                    <tr class="empty-state">
+                                        <td colspan="6">Нет данных истории</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>📈 Статистика</h3>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-value" id="totalSolved">0</div>
+                                <div class="stat-label">Всего решено</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="successRate">0%</div>
+                                <div class="stat-label">Успешность</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="avgTime">0с</div>
+                                <div class="stat-label">Среднее время</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="favoriteSubject">-</div>
+                                <div class="stat-label">Любимый предмет</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Performance Tab -->
+            <section id="performance" class="tab-content">
+                <div class="settings-grid">
+                    <div class="settings-group">
+                        <h3>⚡ Режим производительности</h3>
+                        <div class="radio-group">
+                            <label class="radio">
+                                <input type="radio" name="performanceMode" value="high">
+                                <span class="radio-custom"></span>
+                                <span>Высокая (мощные ПК)</span>
+                            </label>
+                            <label class="radio">
+                                <input type="radio" name="performanceMode" value="balanced" checked>
+                                <span class="radio-custom"></span>
+                                <span>Сбалансированная</span>
+                            </label>
+                            <label class="radio">
+                                <input type="radio" name="performanceMode" value="low">
+                                <span class="radio-custom"></span>
+                                <span>Низкая (слабые ПК)</span>
+                            </label>
+                        </div>
+                        <div class="hint">Выберите режим в зависимости от мощности вашего компьютера</div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>💾 Кэширование</h3>
+                        <div class="form-row">
+                            <label for="cacheSize">Размер кэша (задач):</label>
+                            <div class="range-container">
+                                <input type="range" id="cacheSize" min="0" max="500" step="50">
+                                <span id="cacheSizeValue" class="range-value">100</span>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <label class="switch">
+                                <input type="checkbox" id="enableCache">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="label-text">Включить кэширование</span>
+                        </div>
+                        <button id="clearCache" class="btn btn-secondary">Очистить кэш</button>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>🔧 Оптимизация</h3>
+                        <div class="form-row">
+                            <label class="switch">
+                                <input type="checkbox" id="lazyLoading">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="label-text">Ленивая загрузка скриптов</span>
+                        </div>
+                        <div class="form-row">
+                            <label class="switch">
+                                <input type="checkbox" id="minimizeDOM">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="label-text">Минимизировать работу с DOM</span>
+                        </div>
+                        <div class="form-row">
+                            <label class="switch">
+                                <input type="checkbox" id="batchProcessing">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="label-text">Пакетная обработка задач</span>
+                        </div>
+                    </div>
+
+                    <div class="settings-group full-width">
+                        <h3>📊 Системная информация</h3>
+                        <div class="system-info-grid">
+                            <div class="info-card">
+                                <div class="info-label">Расширение:</div>
+                                <div class="info-value" id="extVersion">-</div>
+                            </div>
+                            <div class="info-card">
+                                <div class="info-label">Браузер:</div>
+                                <div class="info-value" id="browserInfo">-</div>
+                            </div>
+                            <div class="info-card">
+                                <div class="info-label">ОЗУ:</div>
+                                <div class="info-value" id="memoryInfo">-</div>
+                            </div>
+                            <div class="info-card">
+                                <div class="info-label">ЦПУ:</div>
+                                <div class="info-value" id="cpuInfo">-</div>
+                            </div>
+                            <div class="info-card">
+                                <div class="info-label">Активные вкладки:</div>
+                                <div class="info-value" id="tabsCount">-</div>
+                            </div>
+                            <div class="info-card">
+                                <div class="info-label">Хранилище:</div>
+                                <div class="info-value" id="storageUsage">-</div>
+                            </div>
+                        </div>
+                        <button id="refreshSystemInfo" class="btn btn-info">
+                            <span class="icon">🔄</span> Обновить
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-left">
+                <span>Mr. 7B v1.0.0</span>
+                <span class="separator">|</span>
+                <span>AI Browser Controller</span>
+            </div>
+            <div class="footer-right">
+                <button id="helpBtn" class="btn btn-link">Справка</button>
+                <button id="feedbackBtn" class="btn btn-link">Обратная связь</button>
+                <button id="aboutBtn" class="btn btn-link">О программе</button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Подтверждение</h3>
+                <button id="closeModal" class="modal-close">&times;</button>
+            </div>
+            <div id="modalBody" class="modal-body"></div>
+            <div class="modal-footer">
+                <button id="cancelBtn" class="btn btn-secondary">Отмена</button>
+                <button id="confirmBtn" class="btn btn-danger">Подтвердить</button>
+            </div>
+        </div>
+    </div>
+
     <script src="options.js"></script>
 </body>
 </html>
