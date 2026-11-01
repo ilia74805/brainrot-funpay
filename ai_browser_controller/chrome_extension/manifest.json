@@ -12,7 +12,10 @@
     "webRequest",
     "webRequestBlocking",
     "nativeMessaging",
-    "debugger"
+    "debugger",
+    "notifications",
+    "clipboardWrite",
+    "clipboardRead"
   ],
   
   "host_permissions": [
@@ -31,6 +34,11 @@
       "48": "icons/icon48.svg",
       "128": "icons/icon128.svg"
     }
+  },
+  
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": false
   },
   
   "icons": {

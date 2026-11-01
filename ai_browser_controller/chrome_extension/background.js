@@ -249,7 +249,25 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 break;
                 
             case 'openSettings':
-                chrome.tabs.create({ url: 'chrome://extensions/?options=' + chrome.runtime.id });
+                chrome.tabs.create({ url: chrome.runtime.getURL('options.html') });
+                sendResponse({ success: true });
+                break;
+                
+            case 'checkAIConnection':
+                sendResponse({ connected: isConnectedToAI });
+                break;
+                
+            case 'settingsUpdated':
+                isEnabled = request.settings.extensionEnabled;
+                chrome.storage.sync.set({ enabled: isEnabled });
+                chrome.tabs.query({}, (tabs) => {
+                    tabs.forEach(tab => {
+                        chrome.tabs.sendMessage(tab.id, {
+                            action: 'settingsUpdated',
+                            settings: request.settings
+                        });
+                    });
+                });
                 sendResponse({ success: true });
                 break;
         }

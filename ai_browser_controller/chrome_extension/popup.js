@@ -200,6 +200,11 @@ function openSettings() {
     });
 }
 
+// Открытие страницы настроек
+function openOptionsPage() {
+    chrome.tabs.create({ url: chrome.runtime.getURL('options.html') });
+}
+
 // CSS анимации
 const style = document.createElement('style');
 style.textContent = `
